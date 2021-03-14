@@ -2,7 +2,7 @@
 
 Concept: -> -> -> -> ->
 
-left to do:
+left to do:<br/>
 	- saving state in files n readin it back<br/>
 	- console interface<br/>
 	- some general code details.
