@@ -413,5 +413,6 @@ int main(){
     show_list(doing_list, 2);
     show_person_tasks(people, "jjjjjj");
     show_person_tasks(people, "moc");
+    //testing some git commands
     return 0;
 }
