@@ -207,10 +207,10 @@ void add_task(list todo_head, task_list tasks_head, int id, int priority, char *
     return;
 }
 
-//finds requested task
-void find_todo_task(list todo_head, int task_id_target, list * prev, list * cur){
-    * prev = todo_head;
-    * cur = todo_head->next;
+//finds requested card by task id
+void find_card(list list_head, int task_id_target, list * prev, list * cur){
+    * prev = list_head;
+    * cur = list_head->next;
     while(* cur != NULL && (* cur)->task_card->id != task_id_target){
         * prev = * cur;
         * cur = (* cur)->next;
@@ -218,10 +218,10 @@ void find_todo_task(list todo_head, int task_id_target, list * prev, list * cur)
     return;
 }
 
-void remove_task_todo(list todo_head, int task_id_target){
+/* void remove_task_todo(list todo_head, int task_id_target){
     list prev;
     list cur;
-    find_todo_task(todo_head, task_id_target, &prev, &cur);                                //MAYBE find_todo_task(L.211) and neighbours_doing_task(L.237)
+    find_task(todo_head, task_id_target, &prev, &cur);                                //MAYBE find_todo_task(L.211) and neighbours_doing_task(L.237)
     if(cur == NULL){                                                                       //DO THE SAME THING BUT..NOT SURE IF THEY SHOULD BE MERGED..HM 
         printf("Task does not exist");
     }
@@ -231,10 +231,10 @@ void remove_task_todo(list todo_head, int task_id_target){
         free(temp);
     }
     return;
-}
+} */
 
 //finds node right before doing list split for insertation
-void neighbours_doing_task(list doing_head, char * person_name_target, list * prev, list * cur){
+void neighbours_doing_card(list doing_head, char * person_name_target, list * prev, list * cur){
     * prev = doing_head;
     * cur = doing_head->next;
     while(* cur != NULL && strcmp((* cur)->p->name, person_name_target) < 0){
@@ -244,9 +244,20 @@ void neighbours_doing_task(list doing_head, char * person_name_target, list * pr
     return;
 }
 
+//finds node right before doing list split for insertation
+void neighbours_done_card(list done_head, date end_target, list * prev, list * cur){
+    * prev = done_head;
+    * cur = done_head->next;
+    while(* cur != NULL && date_cmp((* cur)->task_card->end, end_target) == 1){
+        * prev = * cur;
+        * cur = (* cur)->next;
+    }
+    return;
+}
+
 
 //finds person to assign task
-void find_person_target(person_list people_head, char * person_name_target, person_list * cur){
+void find_person(person_list people_head, char * person_name_target, person_list * cur){
     * cur = people_head->next;
     while(* cur != NULL && strcmp((* cur)->name, person_name_target) != 0){
         * cur = (* cur)->next;
@@ -254,8 +265,8 @@ void find_person_target(person_list people_head, char * person_name_target, pers
     return;
 }
 
-//finds last person task for insertation
-void find_last_person_task(task_list tasks_head, int done_target, task_list * prev, task_list * cur){
+//finds person task for insertation
+void find_person_task_spot(task_list tasks_head, int done_target, task_list * prev, task_list * cur){
     * prev = tasks_head;
     * cur = tasks_head->next;
     
@@ -268,63 +279,195 @@ void find_last_person_task(task_list tasks_head, int done_target, task_list * pr
     return;
 }
 
-//moves task (task_id_target) from todo to doing list
-void todo_to_doing(list todo_head, list doing_head, person_list people_head, char * person_name_target, int task_id_target, date deadline){
-    list doing_task = (list) malloc(sizeof(list_node));
-    person_list person_target;
-    find_person_target(people_head, person_name_target, &person_target);
+//moves task between lists
+//flag == 1: Todo -> Doing
+//flag == 2: Doing -> Done
+//flag == 3: Done -> Todo
+//flag == 4: Doing -> Todo
+void move_task(int flag, list todo_head, list doing_head, list done_head, person_list people_head, 
+                char * person_name_target, int task_id_target, date deadline, date end){
 
-    if(person_target == NULL){
-        printf("Person %s does not exist. (Create it before assinging task)\n", person_name_target);
-    }
-    else if(doing_head->size > 4){
-        printf("Doing list is full.");
-    }
-    else if(doing_task == NULL){
+    list card = (list) malloc(sizeof(list_node));
+    if(card == NULL){
         printf("Allocation went wrong.");
+        return;
     }
-    else{
-        //finding task in todo list
-        list prev_todo_task_to_move;
-        list todo_task_to_move;
-        find_todo_task(todo_head, task_id_target, &prev_todo_task_to_move, &todo_task_to_move);
+    
+    //pointers to find requested task
+    list prev_card_to_move;
+    list cur_card_to_move;
 
+    if(flag == 1){
+        if(todo_head->next == NULL){
+            printf("Todo list is empty.\n");
+            return;
+        }
+
+        person_list person_target;
+        find_person(people_head, person_name_target, &person_target);
+
+        if(person_target == NULL){
+            printf("Person %s does not exist. (Create it before assinging task)\n", person_name_target);
+            return;
+        }
+        if(doing_head->size > 4){
+            printf("Doing list is full.\n");
+            return;
+        }
+
+        //searching for card in todo list
+        find_card(todo_head, task_id_target, &prev_card_to_move, &cur_card_to_move);
         //if task actually exists
-        if(todo_task_to_move != NULL){
-            list prev_doing_task;
-            list cur_doing_task;
-            neighbours_doing_task(doing_head, person_name_target, &prev_doing_task, &cur_doing_task);
-            printf("HELLO\n");
-            doing_task->next = cur_doing_task;
-            prev_doing_task->next = doing_task;
+        if(cur_card_to_move != NULL){
+            list prev_doing_card;
+            list cur_doing_card;
+            neighbours_doing_card(doing_head, person_name_target, &prev_doing_card, &cur_doing_card);
+            //adding card to doing list
+            card->next = cur_doing_card;
+            prev_doing_card->next = card;
 
             //incrementing doing list size
             doing_head->size++;
 
             //setting doing card task
-            doing_task->task_card = todo_task_to_move->task_card;
+            card->task_card = cur_card_to_move->task_card;
 
             //assigning person to card
-            doing_task->p = person_target;  
+            card->p = person_target;  
 
-            //add task to person tasks
+            //adding task to person tasks
             task_list new_person_task = (task_list) malloc(sizeof(task));
             if(new_person_task != NULL){
-                new_person_task = todo_task_to_move->task_card;
+                new_person_task = cur_card_to_move->task_card;
                 task_list last_person_task_prev;
                 task_list last_person_task_cur;//this aint useless
-                find_last_person_task(person_target->tasks, new_person_task->done, &last_person_task_prev, &last_person_task_cur);
+                find_person_task_spot(person_target->tasks, new_person_task->done, &last_person_task_prev, &last_person_task_cur);
                 last_person_task_prev->next = new_person_task;
                 new_person_task->next = last_person_task_cur;
 
                 //removing card from todo list
-                prev_todo_task_to_move->next = todo_task_to_move->next;
-                free(todo_task_to_move);
+                prev_card_to_move->next = cur_card_to_move->next;
+                free(cur_card_to_move);
+            }
+            else{
+                printf("Allocation on %s tasks went wrong.\n", person_name_target);
             }
         }
         else{
             printf("Task %d does not exist.\n", task_id_target);
         }
+    }
+    
+    else if(flag == 2){
+        if(doing_head->size == 0){
+            printf("Doing list is empty.\n");
+            return;
+        }
+
+        //searching for card in doing list
+        find_card(doing_head, task_id_target, &prev_card_to_move, &cur_card_to_move);
+        if(cur_card_to_move != NULL){
+            list prev_done_card;
+            list cur_done_card;
+            neighbours_done_card(done_head, end, &prev_done_card, &cur_done_card);
+            //adding card to done list
+            card->next = cur_done_card;
+            prev_done_card->next = card;
+
+            //setting done card task
+            card->task_card = cur_card_to_move->task_card;
+
+            //assigning end date to task card
+            card->task_card->end = end;
+
+            //removing card from doing list
+            prev_card_to_move->next = cur_card_to_move->next;
+            free(cur_card_to_move);
+        }
+        else{
+            printf("Task %d does not exist.\n", task_id_target);
+        }
+    }
+
+    else if(flag == 3){
+        if(done_head->next == NULL){
+            printf("Done list is empty.\n");
+            return;
+        }
+
+        //searching for done in todo list
+        find_card(done_head, task_id_target, &prev_card_to_move, &cur_card_to_move);
+        if(cur_card_to_move != NULL){
+            list prev_todo_card;
+            list cur_todo_card;
+            neighbours_todo_card(todo_head, cur_card_to_move->task_card->priority, cur_card_to_move->task_card->genesis, &prev_todo_card, &cur_todo_card);
+            //adding card to todo list
+            card->next = cur_todo_card;
+            prev_todo_card->next = card;
+
+            //setting done card task
+            card->task_card = cur_card_to_move->task_card;
+
+            //removing card from done list
+            prev_card_to_move->next = cur_card_to_move->next;
+            free(cur_card_to_move);
+        }
+        else{
+            printf("Task %d does not exist.\n", task_id_target);
+        }
+    }
+
+    else if(flag == 4){
+        if(doing_head->size == 0){
+            printf("Doing list is empty.\n");
+            return;
+        }
+
+        //searching for done in todo list
+        find_card(doing_head, task_id_target, &prev_card_to_move, &cur_card_to_move);
+        if(cur_card_to_move != NULL){
+            list prev_todo_card;
+            list cur_todo_card;
+            neighbours_todo_card(todo_head, cur_card_to_move->task_card->priority, cur_card_to_move->task_card->genesis, &prev_todo_card, &cur_todo_card);
+            //adding card to todo list
+            card->next = cur_todo_card;
+            prev_todo_card->next = card;
+
+            //setting done card task
+            card->task_card = cur_card_to_move->task_card;
+
+            //removing card from doing list
+            prev_card_to_move->next = cur_card_to_move->next;
+            free(cur_card_to_move);
+        }
+        else{
+            printf("Task %d does not exist.\n", task_id_target);
+        }
+    }
+
+    else{
+        printf("%d is not a valid flag number.\n", flag);
+    }
+
+    return;
+}
+
+void change_doing_task_person(list doing_head, person_list people_head, int task_id_target, char * person_name_heir){
+    person_list person_target;
+    find_person(people_head, person_name_heir, &person_target);
+    if(person_target != NULL){
+        list prev_card_to_change;
+        list cur_card_to_change;
+        find_card(doing_head, task_id_target, &prev_card_to_change, &cur_card_to_change);
+        if(cur_card_to_change != NULL){
+            cur_card_to_change->p = person_target;
+        }
+        else{
+            printf("Task %d does not exist.\n", task_id_target);
+        }
+    }
+    else{
+        printf("Person %s does not exist.\n", person_name_heir);
     }
     return;
 }
@@ -365,7 +508,7 @@ void show_list(list head, int flag){
 void show_person_tasks(person_list people_head, char * person_name_target){
     person_list cur;
     int bz = 0;//this is just so "Done: " only gets printed once, i mean, can you find a better name for this?
-    find_person_target(people_head, person_name_target, &cur);
+    find_person(people_head, person_name_target, &cur);
     if(cur != NULL){
         task_list person_tasks = cur->tasks->next;
         printf("%s tasks: ", person_name_target);
@@ -383,6 +526,9 @@ void show_person_tasks(person_list people_head, char * person_name_target){
         }
         printf("\n");
     }
+    else{
+        printf("Person %s does not exist.\n", person_name_target);
+    }
     return;
 }
 
@@ -390,6 +536,7 @@ int main(){
     task_list tasks_list = make_task_list();
     list todo_list = make_list();
     list doing_list = make_list();
+    list done_list = make_list();
     person_list people = make_person_list();
     add_person(people, 1, "jjjjjj");
     add_person(people, 2, "mandelbrot");
@@ -397,22 +544,45 @@ int main(){
     show_people(people);
     add_task(todo_list, tasks_list, 1, 10, "ganza", make_date("29-12-2000"), make_date("29-12-2000"));
     add_task(todo_list, tasks_list, 2, 6, "ganza2", make_date("29-12-2002"), make_date("29-12-2001"));
-    add_task(todo_list, tasks_list, 3, 6, "ganza3", make_date("29-12-2001"), make_date("29-12-2000"));
+    add_task(todo_list, tasks_list, 3, 6, "ganza3", make_date("29-12-2001"), make_date("29-12-2001"));
     add_task(todo_list, tasks_list, 4, 8, "ganza4", make_date("29-12-2005"), make_date("29-12-2005"));
     show_tasks(tasks_list);
     printf("###############\n");
-    show_list(todo_list, 1);
     //remove_task_todo(todo_list, 3);
     show_list(todo_list, 1);
     show_list(doing_list, 2);
+    show_list(done_list, 1);
     printf("AFTER MOVING GANZAs\n");
-    todo_to_doing(todo_list, doing_list, people, "mandelbrot", 3, make_date("12-3-2040"));
-    todo_to_doing(todo_list, doing_list, people, "moc", 1, make_date("12-3-2040"));
-    todo_to_doing(todo_list, doing_list, people, "jjjjjj", 4, make_date("12-3-2040"));
+    move_task(1, todo_list, doing_list, done_list, people, "mandelbrot", 3, make_date("29-12-2001"), make_date("29-12-2001"));
+    move_task(1, todo_list, doing_list, done_list, people, "moc", 1, make_date("29-12-2000"), make_date("29-12-2000"));
+    move_task(1, todo_list, doing_list, done_list, people, "jjjjjj", 4, make_date("29-12-2005"), make_date("29-12-2005"));
     show_list(todo_list, 1);
     show_list(doing_list, 2);
     show_person_tasks(people, "jjjjjj");
     show_person_tasks(people, "moc");
+    move_task(2, todo_list, doing_list, done_list, people, "mandelbrot", 3, make_date("29-12-2001"), make_date("29-12-2001"));
+    move_task(2, todo_list, doing_list, done_list, people, "mandelbrot", 4, make_date("29-12-2005"), make_date("29-12-2005"));
+    printf("############################\n");
+    show_list(todo_list, 1);
+    show_list(doing_list, 1);
+    show_list(done_list, 1);
+    printf("MOVING FROM DONE TO TODO\n");
+    move_task(3, todo_list, doing_list, done_list, people, "mandelbrot", 4, make_date("29-12-2005"), make_date("29-12-2005"));
+    show_list(todo_list, 1);
+    show_list(doing_list, 1);
+    show_list(done_list, 1);
+    printf("MOVING FROM DOING TO TODO\n");
+    move_task(4, todo_list, doing_list, done_list, people, "mandelbrot", 1, make_date("29-12-2005"), make_date("29-12-2005"));
+    show_list(todo_list, 1);
+    show_list(doing_list, 2);
+    move_task(1, todo_list, doing_list, done_list, people, "mandelbrot", 1, make_date("29-12-2005"), make_date("29-12-2005"));
+    move_task(1, todo_list, doing_list, done_list, people, "mandelbrot", 2, make_date("29-12-2005"), make_date("29-12-2005"));
+    printf("$$$$$$$$$$$$$$$$$$$$$$$$$\n");
+    show_list(todo_list, 2);
+    show_list(doing_list, 2);
+    printf("CHANGING GANZA TASK TO MOC\n");
+    change_doing_task_person(doing_list, people, 1, "moc");
+    show_list(doing_list, 2);
     //testing some git commands
     return 0;
 }
