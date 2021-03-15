@@ -164,7 +164,7 @@ void neighbours_todo_card(list todo_head, int priority_target, date genesis_targ
 }
 
 //creates a task, gets added to both todo and tasks list
-void add_task(list todo_head, task_list tasks_head, int id, int priority, char * description, date genesis, date end){
+void add_task(list todo_head, task_list tasks_head, int id, int priority, char * description, date genesis){
     if(priority < 1 || priority > 10){
         printf("Invalid priority value.\n");
         return;
@@ -181,7 +181,6 @@ void add_task(list todo_head, task_list tasks_head, int id, int priority, char *
         new_task->priority = priority;
         new_task->description = description;
         new_task->genesis = genesis;
-        new_task->end = end;
 
         //sets task neighbours
         neighbours_task(tasks_head, genesis, &prev, &cur);
@@ -256,7 +255,7 @@ void neighbours_done_card(list done_head, date end_target, list * prev, list * c
 }
 
 
-//finds person to assign task
+//finds target person
 void find_person(person_list people_head, char * person_name_target, person_list * cur){
     * cur = people_head->next;
     while(* cur != NULL && strcmp((* cur)->name, person_name_target) != 0){
@@ -366,6 +365,12 @@ void move_task(int flag, list todo_head, list doing_head, list done_head, person
 
         //searching for card in doing list
         find_card(doing_head, task_id_target, &prev_card_to_move, &cur_card_to_move);
+
+        if(date_cmp(cur_card_to_move->task_card->genesis, end) == 1){
+            printf("End date must come after genesis date.\n");
+            return;
+        }
+
         if(cur_card_to_move != NULL){
             list prev_done_card;
             list cur_done_card;
@@ -395,7 +400,7 @@ void move_task(int flag, list todo_head, list doing_head, list done_head, person
             return;
         }
 
-        //searching for done in todo list
+        //searching for card in done list
         find_card(done_head, task_id_target, &prev_card_to_move, &cur_card_to_move);
         if(cur_card_to_move != NULL){
             list prev_todo_card;
@@ -472,6 +477,7 @@ void change_doing_task_person(list doing_head, person_list people_head, int task
     return;
 }
 
+//prints people 
 void show_people(person_list people_head){
     person_list cur = people_head->next;
     while(cur != NULL){
@@ -482,6 +488,7 @@ void show_people(person_list people_head){
     return;
 }
 
+//prints all tasks
 void show_tasks(task_list tasks_head){
     task_list cur = tasks_head->next;
 
@@ -493,6 +500,7 @@ void show_tasks(task_list tasks_head){
     return;
 }
 
+//prints w/e list (todo, doing, done)
 void show_list(list head, int flag){
     list cur = head->next;
 
@@ -505,6 +513,7 @@ void show_list(list head, int flag){
     return;
 }
 
+//prints tasks of specific person   
 void show_person_tasks(person_list people_head, char * person_name_target){
     person_list cur;
     int bz = 0;//this is just so "Done: " only gets printed once, i mean, can you find a better name for this?
@@ -542,10 +551,10 @@ int main(){
     add_person(people, 2, "mandelbrot");
     add_person(people, 3, "moc");
     show_people(people);
-    add_task(todo_list, tasks_list, 1, 10, "ganza", make_date("29-12-2000"), make_date("29-12-2000"));
-    add_task(todo_list, tasks_list, 2, 6, "ganza2", make_date("29-12-2002"), make_date("29-12-2001"));
-    add_task(todo_list, tasks_list, 3, 6, "ganza3", make_date("29-12-2001"), make_date("29-12-2001"));
-    add_task(todo_list, tasks_list, 4, 8, "ganza4", make_date("29-12-2005"), make_date("29-12-2005"));
+    add_task(todo_list, tasks_list, 1, 10, "ganza", make_date("29-12-2000"));
+    add_task(todo_list, tasks_list, 2, 6, "ganza2", make_date("29-12-2002"));
+    add_task(todo_list, tasks_list, 3, 6, "ganza3", make_date("29-12-2001"));
+    add_task(todo_list, tasks_list, 4, 8, "ganza4", make_date("29-12-2005"));
     show_tasks(tasks_list);
     printf("###############\n");
     //remove_task_todo(todo_list, 3);
