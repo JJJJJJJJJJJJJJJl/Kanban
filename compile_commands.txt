@@ -1,0 +1,16 @@
+-> compiling libdate
+    gcc -Wall -c date.c
+    ar -rc libdate.a date.o
+    ar -t libdate.a
+
+->compiling libpeople_tasks_list
+    gcc -Wall -c people_tasks_list.c
+    ar -rc libpeople_tasks_list.a people_tasks_list.o 
+    ar -t libpeople_tasks_list.a
+
+->compiling libpdd_list
+    gcc -Wall -c pdd_list.c
+    ar -rc libpdd_list.a pdd_list.o 
+    ar -t libpdd.a
+    
+gcc -Wall main.c -o main -L. -ldate -lpeople_tasks_list (soon with more libs )
