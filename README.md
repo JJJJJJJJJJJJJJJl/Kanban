@@ -1,6 +1,6 @@
 # C Pointers slat@*`;:Çª_
 
-![birch](./assets/hisoka_slat.png)
+![birch](./assets/killua_slat.png)
 
 Concept: -> -> -> -> ->
 
