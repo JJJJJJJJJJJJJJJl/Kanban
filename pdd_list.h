@@ -1,3 +1,6 @@
+#ifndef PDD_LIST_H_INCLUDED
+#define PDD_LIST_H_INCLUDED
+
 #include "people_tasks_list.h"
 
 typedef struct list_node * list; 
@@ -17,3 +20,5 @@ void neighbours_done_card(list, date, list *, list *);
 void move_task(int, list, list, list, person_list, char *, int, date, date);
 void change_doing_task_person(list, person_list, int, char *);
 void show_list(list, int);
+
+#endif

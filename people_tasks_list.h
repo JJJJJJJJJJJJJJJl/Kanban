@@ -3,6 +3,9 @@
     so theres no dependency cycle.
 */
 
+#ifndef PEOPLE_TASKS_LIST_H_INCLUDED
+#define PEOPLE_TASKS_LIST_H_INCLUDED
+
 #include "date.h"
 
 typedef struct task * task_list;
@@ -38,3 +41,5 @@ void find_person(person_list, char *, person_list *);
 void find_last_person(person_list, person_list *);
 void show_people(person_list);
 void show_person_tasks(person_list, char *);
+
+#endif
