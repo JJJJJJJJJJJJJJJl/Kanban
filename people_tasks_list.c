@@ -14,7 +14,7 @@ task_list make_task_list(){
     return ward;
 }
 
-//finds nnode right before tasks list split for insertation
+//finds node right before tasks list split for insertation
 void neighbours_task(task_list head, date genesis_target, task_list * prev, task_list * cur){
     * prev = head;
     * cur = head->next;

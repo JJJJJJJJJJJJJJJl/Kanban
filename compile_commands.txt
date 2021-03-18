@@ -1,16 +1,10 @@
 -> compiling libdate
-    gcc -Wall -c date.c
-    ar -rc libdate.a date.o
-    ar -t libdate.a
+    gcc -Wall -c date.c && ar -rc libdate.a date.o && ar -t libdate.a
 
 ->compiling libpeople_tasks_list
-    gcc -Wall -c people_tasks_list.c
-    ar -rc libpeople_tasks_list.a people_tasks_list.o 
-    ar -t libpeople_tasks_list.a
+    gcc -Wall -c people_tasks_list.c && ar -rc libpeople_tasks_list.a people_tasks_list.o  && ar -t libpeople_tasks_list.a
 
 ->compiling libpdd_list
-    gcc -Wall -c pdd_list.c
-    ar -rc libpdd_list.a pdd_list.o 
-    ar -t libpdd_list.a
+    gcc -Wall -c pdd_list.c && ar -rc libpdd_list.a pdd_list.o  && ar -t libpdd_list.a
     
 gcc -Wall main.c -o main -L. -lpdd_list -lpeople_tasks_list -ldate

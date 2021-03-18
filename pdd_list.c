@@ -40,35 +40,35 @@ void add_task(list todo_head, task_list tasks_head, int id, int priority, char *
         return;
     }
 
-    //adds to tasks_list
+    //adding to tasks_list
     task_list new_task = (task_list) malloc(sizeof(task));
     if(new_task != NULL){
         task_list prev;
         task_list cur;
 
-        //sets task data
+        //setting task data
         new_task->id = id;
         new_task->priority = priority;
         new_task->description = description;
         new_task->genesis = genesis;
 
-        //sets task neighbours
+        //setting task neighbours
         neighbours_task(tasks_head, genesis, &prev, &cur);
         new_task->next = cur;
         prev->next = new_task; 
     }
 
-    //adds to todo_list
+    //adding to todo_list
     list new_card = (list) malloc(sizeof(list_node));
     if(new_card != NULL){
         list prev;
         list cur;
 
-        //sets card data
+        //settingcard data
         new_card->size = -1;
         new_card->task_card = new_task;
 
-        //sets card neighbours
+        //setting card neighbours
         neighbours_todo_card(todo_head, priority, genesis, &prev, &cur);
         new_card->next = cur;
         prev->next = new_card;
@@ -91,7 +91,7 @@ void find_card(list list_head, int task_id_target, list * prev, list * cur){
 void neighbours_doing_card(list doing_head, char * person_name_target, list * prev, list * cur){
     * prev = doing_head;
     * cur = doing_head->next;
-    while(* cur != NULL && strcmp((* cur)->p->name, person_name_target) < 0){
+    while(* cur != NULL && strcmp((* cur)->task_card->p->name, person_name_target) < 0){
         * prev = * cur;
         * cur = (* cur)->next;
     }
@@ -163,7 +163,7 @@ void move_task(int flag, list todo_head, list doing_head, list done_head, person
             card->task_card = cur_card_to_move->task_card;
 
             //assigning person to card
-            card->p = person_target;  
+            card->task_card->p = person_target;  
 
             //adding task to person tasks
             task_list new_person_task = (task_list) malloc(sizeof(task));
@@ -296,7 +296,7 @@ void change_doing_task_person(list doing_head, person_list people_head, int task
         list cur_card_to_change;
         find_card(doing_head, task_id_target, &prev_card_to_change, &cur_card_to_change);
         if(cur_card_to_change != NULL){
-            cur_card_to_change->p = person_target;
+            cur_card_to_change->task_card->p = person_target;
         }
         else{
             printf("Task %d does not exist.\n", task_id_target);
@@ -314,7 +314,7 @@ void show_list(list head, int flag){
 
     while(cur != NULL){
         if(flag == 1) printf("%s | ", cur->task_card->description);
-        else printf("(%s,%s) ", cur->p->name, cur->task_card->description);
+        else printf("(%s,%s) ", cur->task_card->p->name, cur->task_card->description);
         cur = cur->next;
     }
     printf("\n");

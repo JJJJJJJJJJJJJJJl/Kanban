@@ -7,7 +7,6 @@ typedef struct list_node * list;
 typedef struct list_node{
     int size; //Doing(5) list purposes only
     task_list task_card;
-    person_list p;//Doing(5) list purposes only
     list next;
 }list_node;
 
