@@ -34,7 +34,7 @@ void neighbours_todo_card(list todo_head, int priority_target, date genesis_targ
 }
 
 //creates a task, gets added to both todo and tasks list
-void add_task(list todo_head, task_list tasks_head, int id, int priority, char * description, date genesis){
+void add_task(list todo_head, task_list tasks_head, int id, int priority, char * description, int pos, date genesis){
     if(priority < 1 || priority > 10){
         printf("Invalid priority value.\n");
         return;
@@ -50,6 +50,7 @@ void add_task(list todo_head, task_list tasks_head, int id, int priority, char *
         new_task->id = id;
         new_task->priority = priority;
         new_task->description = description;
+        new_task->pipeline_pos = 0;
         new_task->genesis = genesis;
 
         //setting task neighbours
@@ -114,6 +115,9 @@ void neighbours_done_card(list done_head, date end_target, list * prev, list * c
 //flag == 2: Doing -> Done
 //flag == 3: Done -> Todo
 //flag == 4: Doing -> Todo
+//pos == 0 -> Todo
+//pos == 1 -> Doing
+//pos == 2 -> Done
 void move_task(int flag, list todo_head, list doing_head, list done_head, person_list people_head, 
                 char * person_name_target, int task_id_target, date deadline, date end){
 
@@ -161,27 +165,14 @@ void move_task(int flag, list todo_head, list doing_head, list done_head, person
 
             //setting doing card task
             card->task_card = cur_card_to_move->task_card;
+            card->task_card->pipeline_pos = 1;
 
             //assigning person to card
             card->task_card->p = person_target;  
 
-            //adding task to person tasks
-            task_list new_person_task = (task_list) malloc(sizeof(task));
-            if(new_person_task != NULL){
-                new_person_task = cur_card_to_move->task_card;
-                task_list last_person_task_prev;
-                task_list last_person_task_cur;//this aint useless
-                find_person_task(person_target->tasks, new_person_task->done, &last_person_task_prev, &last_person_task_cur);
-                last_person_task_prev->next = new_person_task;
-                new_person_task->next = last_person_task_cur;
-
-                //removing card from todo list
-                prev_card_to_move->next = cur_card_to_move->next;
-                free(cur_card_to_move);
-            }
-            else{
-                printf("Allocation on %s tasks went wrong.\n", person_name_target);
-            }
+            //removing card from todo list
+            prev_card_to_move->next = cur_card_to_move->next;
+            free(cur_card_to_move);
         }
         else{
             printf("Task %d does not exist.\n", task_id_target);
@@ -197,21 +188,25 @@ void move_task(int flag, list todo_head, list doing_head, list done_head, person
         //searching for card in doing list
         find_card(doing_head, task_id_target, &prev_card_to_move, &cur_card_to_move);
 
-        if(date_cmp(cur_card_to_move->task_card->genesis, end) == 1){
-            printf("End date must come after genesis date.\n");
-            return;
-        }
-
         if(cur_card_to_move != NULL){
+            if(date_cmp(cur_card_to_move->task_card->genesis, end) == 1){
+                printf("End date must come after genesis date.\n");
+                return;
+            }
+
             list prev_done_card;
             list cur_done_card;
             neighbours_done_card(done_head, end, &prev_done_card, &cur_done_card);
+
+            done_head->size++;
+
             //adding card to done list
             card->next = cur_done_card;
             prev_done_card->next = card;
 
             //setting done card task
             card->task_card = cur_card_to_move->task_card;
+            card->task_card->pipeline_pos = 2;
 
             //assigning end date to task card
             card->task_card->end = end;
@@ -237,12 +232,16 @@ void move_task(int flag, list todo_head, list doing_head, list done_head, person
             list prev_todo_card;
             list cur_todo_card;
             neighbours_todo_card(todo_head, cur_card_to_move->task_card->priority, cur_card_to_move->task_card->genesis, &prev_todo_card, &cur_todo_card);
+
+            done_head->size--;
+
             //adding card to todo list
             card->next = cur_todo_card;
             prev_todo_card->next = card;
 
             //setting done card task
             card->task_card = cur_card_to_move->task_card;
+            card->task_card->pipeline_pos = 0;
 
             //removing card from done list
             prev_card_to_move->next = cur_card_to_move->next;
@@ -271,6 +270,7 @@ void move_task(int flag, list todo_head, list doing_head, list done_head, person
 
             //setting done card task
             card->task_card = cur_card_to_move->task_card;
+            card->task_card->pipeline_pos = 0;
 
             //removing card from doing list
             prev_card_to_move->next = cur_card_to_move->next;

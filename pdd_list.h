@@ -5,14 +5,14 @@
 
 typedef struct list_node * list; 
 typedef struct list_node{
-    int size; //Doing(5) list purposes only
+    int size; //Doing(5)/Done list purposes only
     task_list task_card;
     list next;
 }list_node;
 
 list make_list();
 void neighbours_todo_card(list, int, date, list *, list *);
-void add_task(list, task_list, int, int, char *, date);
+void add_task(list, task_list, int, int, char *, int, date);
 void find_card(list, int, list *, list *);
 void neighbours_doing_card(list, char *, list *, list *);
 void neighbours_done_card(list, date, list *, list *);

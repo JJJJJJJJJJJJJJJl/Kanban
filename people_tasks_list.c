@@ -113,29 +113,31 @@ void show_people(person_list people_head){
 }
 
 //prints tasks of specific person   
-void show_person_tasks(person_list people_head, char * person_name_target){
-    person_list cur;
-    int bz = 0;//this is just so "Done: " only gets printed once, i mean, can you find a better name for this?
-    find_person(people_head, person_name_target, &cur);
-    if(cur != NULL){
-        task_list person_tasks = cur->tasks->next;
-        printf("%s tasks: ", person_name_target);
-        printf("\n\t\tDoing: ");
-        while(person_tasks != NULL){
-            printf("%s | ", person_tasks->description);
-            if(person_tasks->done == 1 && bz == 0){
-                printf("\n\t\tDone: ");
-                bz = 1;
+void show_person_tasks(task_list tasks_head, int person_id_target, int done_size){
+    char * doing[5];
+    int doing_in = 0;
+    char * done[done_size];
+    int done_in = 0;
+    task_list cur = tasks_head->next; 
+    while(cur != NULL){
+        if(cur->p != NULL && person_id_target == cur->p->id){
+            if(cur->pipeline_pos == 1){
+                doing[doing_in++] = cur->description;
             }
-            person_tasks = person_tasks->next;
+            else if(cur->pipeline_pos == 2){
+                done[done_in++] = cur->description;
+            }
         }
-        if(bz == 0){
-            printf("\n\t\tDone: ");
-        }
-        printf("\n");
+        cur = cur->next;
     }
-    else{
-        printf("Person %s does not exist.\n", person_name_target);
+    printf("Doing: "); 
+    for(int i=0; i<doing_in; i++){
+        printf("%s ", doing[i]);
     }
+    printf("\nDone: ");
+    for(int i=0; i<done_in; i++){
+        printf("%s ", done[i]);
+    }
+    printf("\n");
     return;
 }

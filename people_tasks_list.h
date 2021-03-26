@@ -22,6 +22,7 @@ typedef struct task{
     int id;
     int priority;
     char * description;
+    int pipeline_pos;
     person_list p;
     date genesis;
     date deadline;
@@ -40,6 +41,6 @@ void add_person(person_list, int, char *);
 void find_person(person_list, char *, person_list *);
 void find_last_person(person_list, person_list *);
 void show_people(person_list);
-void show_person_tasks(person_list, char *);
+void show_person_tasks(task_list, int, int);
 
 #endif
