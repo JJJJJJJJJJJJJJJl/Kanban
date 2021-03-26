@@ -14,7 +14,6 @@ typedef struct person * person_list;
 typedef struct person{
     int id;
     char * name;
-    task_list tasks;
     person_list next;
 }person;
 
