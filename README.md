@@ -7,4 +7,4 @@ left to do:<br/>
 	- console interface<br/>
 	- some general code details.
 
-![alt text](./assets/scheme.png)
+![ScreenShot](./assets/scheme.png)
