@@ -5,6 +5,6 @@ Concept: -> -> -> -> ->
 left to do:<br/>
 	- saving state in files n readin it back<br/>
 	- console interface<br/>
-	- some general code details.
+	- some general code details.<br/>
 
-![ScreenShot](/assets/scheme.png)
+![birch](./assets/scheme.png)
