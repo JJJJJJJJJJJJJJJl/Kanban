@@ -7,4 +7,4 @@ left to do:<br/>
 	- console interface<br/>
 	- some general code details.
 
-![birch](./assets/scheme.png)
+![alt text](./assets/scheme.png)
