@@ -14,6 +14,7 @@ typedef struct person * person_list;
 typedef struct person{
     int id;
     char * name;
+    task_list tasks;
     person_list next;
 }person;
 
@@ -26,20 +27,21 @@ typedef struct task{
     date genesis;
     date deadline;
     date end;
-    int done;//Printing a person tasks purposes only
-    task_list next;
+    task_list next;//next in general tasks list 
+    task_list next_p;//next in person tasks list
 }task;
 
 task_list make_task_list();
 void neighbours_task(task_list, date, task_list *, task_list *);
-void find_person_task(task_list tasks_head, int done_target, task_list * prev, task_list * cur);
+void find_person_task(task_list, int, task_list *, task_list *);
+void find_person_task_neighbours(task_list, int, date, task_list *, task_list *);
 void show_tasks(task_list);
 
 person_list make_people_list();
 void add_person(person_list, int, char *);
-void find_person(person_list, char *, person_list *);
+void find_person(person_list, int, person_list *);
 void find_last_person(person_list, person_list *);
 void show_people(person_list);
-void show_person_tasks(task_list, int, int);
+void show_person_tasks(person_list, int, int);
 
 #endif

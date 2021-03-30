@@ -27,15 +27,38 @@ void neighbours_task(task_list head, date genesis_target, task_list * prev, task
     return;
 }
 
-//finds person task for insertation
-void find_person_task(task_list tasks_head, int done_target, task_list * prev, task_list * cur){
+//finds person task (moving it across person tasks list purposes)
+void find_person_task(task_list tasks_head, int task_id_target, task_list * prev, task_list * cur){
     * prev = tasks_head;
-    * cur = tasks_head->next;
+    * cur = tasks_head->next_p;
     
-    if(done_target == 1){
-        while((* cur)->next != NULL && (* cur)->done != 1){
+    while(* cur != NULL && (* cur)->id != task_id_target){
+        * prev = * cur;
+        * cur = (* cur)->next_p;
+    }
+    return;
+}
+
+//finds person task neighbours for insertation
+void find_person_task_neighbours(task_list tasks_head, int pipeline_pos, date end_target, task_list * prev, task_list * cur){
+    * prev = tasks_head;
+    * cur = tasks_head->next_p;
+    
+    //task is on doing list, so it can rly just be added in the beggining since doing list tasks ordered by person name.
+    if(pipeline_pos == 1){
+        return;
+    }
+
+    //task in on done list so must be inserted by end date
+    else{
+        //traversing till it reaches first 'done' task;
+        while(* cur != NULL  && (* cur)->pipeline_pos == 1){
             * prev = * cur;
-            * cur = (* cur)->next;
+            * cur = (* cur)->next_p;
+        }
+        while(* cur != NULL && date_cmp((* cur)->end, end_target) == 1){
+            * prev = * cur;
+            * cur = (* cur)->next_p;
         }
     }
     return;
@@ -72,6 +95,7 @@ void add_person(person_list people_head, int id, char * name){
         if(person_tasks != NULL){
             person_tasks->next = NULL;
             new_person->id = id;
+            new_person->tasks = make_task_list();
             new_person->name = name;
         }
         person_list cur;
@@ -83,9 +107,9 @@ void add_person(person_list people_head, int id, char * name){
 }
 
 //finds target person
-void find_person(person_list people_head, char * person_name_target, person_list * cur){
+void find_person(person_list people_head, int person_id_target, person_list * cur){
     * cur = people_head->next;
-    while(* cur != NULL && strcmp((* cur)->name, person_name_target) != 0){
+    while(* cur != NULL && (* cur)->id != person_id_target){
         * cur = (* cur)->next;
     }
     return;
@@ -112,8 +136,25 @@ void show_people(person_list people_head){
 }
 
 //prints tasks of specific person   
-void show_person_tasks(task_list tasks_head, int person_id_target, int done_size){
-    char * doing[5];
+void show_person_tasks(person_list people_head, int person_id_target, int done_size){
+    person_list cur;
+    find_person(people_head, person_id_target, &cur);
+
+    task_list cur_person_task = cur->tasks->next_p;
+    int zzz = 0;
+    printf("Doing: ");
+    while(cur_person_task != NULL){
+        if(cur_person_task->pipeline_pos == 2){
+            zzz = 1;
+            printf("\nDone: ");
+        }
+        printf("%s | ", cur_person_task->description);
+        cur_person_task = cur_person_task->next_p;
+    }
+    if(zzz == 0){
+        printf("\nDone: ");
+    }
+    /* char * doing[5];
     int doing_in = 0;
     char * done[done_size];
     int done_in = 0;
@@ -136,7 +177,7 @@ void show_person_tasks(task_list tasks_head, int person_id_target, int done_size
     printf("\nDone: ");
     for(int i=0; i<done_in; i++){
         printf("%s ", done[i]);
-    }
+    } */
     printf("\n");
     return;
 }

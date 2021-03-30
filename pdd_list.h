@@ -16,8 +16,8 @@ void add_task(list, task_list, int, int, char *, int, date);
 void find_card(list, int, list *, list *);
 void neighbours_doing_card(list, char *, list *, list *);
 void neighbours_done_card(list, date, list *, list *);
-void move_task(int, list, list, list, person_list, char *, int, date, date);
-void change_doing_task_person(list, person_list, int, char *);
+void move_task(int, list, list, list, person_list, int, int, date, date);
+void change_doing_task_person(list, person_list, int, int);
 void show_list(list, int);
 
 #endif
