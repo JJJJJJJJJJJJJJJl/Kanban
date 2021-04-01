@@ -154,30 +154,6 @@ void show_person_tasks(person_list people_head, int person_id_target, int done_s
     if(zzz == 0){
         printf("\nDone: ");
     }
-    /* char * doing[5];
-    int doing_in = 0;
-    char * done[done_size];
-    int done_in = 0;
-    task_list cur = tasks_head->next; 
-    while(cur != NULL){
-        if(cur->p != NULL && person_id_target == cur->p->id){
-            if(cur->pipeline_pos == 1){
-                doing[doing_in++] = cur->description;
-            }
-            else if(cur->pipeline_pos == 2){
-                done[done_in++] = cur->description;
-            }
-        }
-        cur = cur->next;
-    }
-    printf("Doing: "); 
-    for(int i=0; i<doing_in; i++){
-        printf("%s ", doing[i]);
-    }
-    printf("\nDone: ");
-    for(int i=0; i<done_in; i++){
-        printf("%s ", done[i]);
-    } */
     printf("\n");
     return;
 }

@@ -34,7 +34,7 @@ void neighbours_todo_card(list todo_head, int priority_target, date genesis_targ
 }
 
 //creates a task, gets added to both todo and tasks list
-void add_task(list todo_head, task_list tasks_head, int id, int priority, char * description, int pos, date genesis){
+void add_task(list todo_head, task_list tasks_head, int id, int priority, char * description, date genesis){
     if(priority < 1 || priority > 10){
         printf("Invalid priority value.\n");
         return;
@@ -49,7 +49,7 @@ void add_task(list todo_head, task_list tasks_head, int id, int priority, char *
         //setting task data
         new_task->id = id;
         new_task->priority = priority;
-        new_task->description = description;
+        new_task->description = strdup(description);
         new_task->pipeline_pos = 0;
         new_task->genesis = genesis;
 
