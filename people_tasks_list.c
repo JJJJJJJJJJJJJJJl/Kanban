@@ -96,7 +96,7 @@ void add_person(person_list people_head, int id, char * name){
             person_tasks->next = NULL;
             new_person->id = id;
             new_person->tasks = make_task_list();
-            new_person->name = name;
+            new_person->name = strdup(name);
         }
         person_list cur;
         find_last_person(people_head, &cur);

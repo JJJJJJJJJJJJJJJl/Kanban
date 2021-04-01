@@ -1,9 +1,56 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include "pdd_list.h"
 
-int cur_person_id = 1;
+int cur_person_id = 0;
+
+char* itoa(int num, char* buffer, int base) {
+    int curr = 0;
+ 
+    if (num == 0) {
+        // Base case
+        buffer[curr++] = '0';
+        buffer[curr] = '\0';
+        return buffer;
+    }
+ 
+    int num_digits = 0;
+ 
+    if (num < 0) {
+        if (base == 10) {
+            num_digits ++;
+            buffer[curr] = '-';
+            curr ++;
+            // Make it positive and finally add the minus sign
+            num *= -1;
+        }
+        else
+            // Unsupported base. Return NULL
+            return NULL;
+    }
+ 
+    num_digits += (int)floor(log(num) / log(base)) + 1;
+ 
+    // Go through the digits one by one
+    // from left to right
+    while (curr < num_digits) {
+        // Get the base value. For example, 10^2 = 1000, for the third digit
+        int base_val = (int) pow(base, num_digits-1-curr);
+ 
+        // Get the numerical value
+        int num_val = num / base_val;
+ 
+        char value = num_val + '0';
+        buffer[curr] = value;
+ 
+        curr ++;
+        num -= base_val * num_val;
+    }
+    buffer[curr] = '\0';
+    return buffer;
+}
 
 void save_people(person_list people_head){
     person_list cur = people_head->next;
@@ -11,9 +58,8 @@ void save_people(person_list people_head){
 
     while(cur != NULL){
         if(fp != NULL){
-            printf("%s\n", cur->name);
-            fwrite(&(cur->id), sizeof(int), 1, fp);
-            fwrite(cur->name, sizeof(char), strlen(cur->name) + 1, fp);
+            fprintf(fp, "%d ", cur->id);
+            fprintf(fp, "%s ", cur->name);
         }
         cur = cur->next;
     }
@@ -21,18 +67,12 @@ void save_people(person_list people_head){
 }
 
 void recover_people(person_list people_head){
-    FILE * fp = fopen("people.dat", "rb");
-    person p;
-
-    while(1){
-        fread(&(p.id), sizeof(int), 1, fp);
-        fread(p.name, 1, sizeof(char)*70, fp);
-        if(feof(fp)) {
-            break;
-        }
-        printf("%d | %s\n", p.id, p.name);
-        add_person(people_head, p.id, p.name);
-        printf("ASIHDB22222\n");
+    FILE * fp = fopen("people.txt", "r");
+    int person_id;
+    char person_name[20];
+    while(fscanf(fp, "%d %s ", &person_id, person_name) == 2){
+        printf("%d | %s\n", person_id, person_name);
+        add_person(people_head, person_id, person_name);
         cur_person_id++;
     }
     fclose(fp);
@@ -45,16 +85,16 @@ int main(){
     list doing_list = make_list();
     list done_list = make_list();
     person_list people = make_people_list();
-    add_person(people, 1, "jjjjjj");
+    /* add_person(people, 1, "jjjjjj");
     add_person(people, 2, "mandelbrot");
-    add_person(people, 3, "moc");
-    /* recover_people(people);
+    add_person(people, 3, "moc"); */
+    recover_people(people);
     show_people(people);
     add_person(people, cur_person_id++, "carti");
-    show_people(people); */
-    //save_people(people);
+    show_people(people);
+    save_people(people);
 
-    add_task(todo_list, tasks_list, 1, 10, "aznag", 0, make_date("29-12-2000"));
+    /* add_task(todo_list, tasks_list, 1, 10, "aznag", 0, make_date("29-12-2000"));
     add_task(todo_list, tasks_list, 2, 6, "aznag2", 0, make_date("29-12-2002"));
     add_task(todo_list, tasks_list, 3, 6, "aznag3", 0 ,make_date("29-12-2001"));
     add_task(todo_list, tasks_list, 4, 8, "aznag4", 0, make_date("29-12-2005"));
@@ -129,6 +169,6 @@ int main(){
     show_list(doing_list, 2);
     move_task(2, todo_list, doing_list, done_list, people, 3, 4, make_date("29-12-2005"), make_date("29-12-2005"));
     show_person_tasks(people, 1, done_list->size);
-    show_person_tasks(people, 3, done_list->size);
+    show_person_tasks(people, 3, done_list->size); */
     return 0;
 }
