@@ -25,6 +25,11 @@ void neighbours_todo_card(list todo_head, int priority_target, date genesis_targ
         * cur = (* cur)->next; 
     }
 
+    //no equal prioritys
+    if(* cur != NULL && (*cur)->task_card->priority < priority_target){
+        return;
+    }
+
     //this's for the case of multiple equal prioritys so it finds node right before the split by task genesis date
     while(* cur != NULL && date_cmp((* cur)->task_card->genesis, genesis_target) == -1){
         * prev = * cur;
@@ -168,7 +173,10 @@ void move_task(int flag, list todo_head, list doing_head, list done_head, person
             card->task_card->pipeline_pos = 1;
 
             //assigning person to card
-            card->task_card->p = person_target; 
+            card->task_card->p = person_target;
+
+            //assigning deadline date to task card
+            card->task_card->deadline = deadline; 
 
             task_list new_person_task = (task_list) malloc(sizeof(task));
             if(new_person_task != NULL){
@@ -247,6 +255,7 @@ void move_task(int flag, list todo_head, list doing_head, list done_head, person
             prev_card_to_move->next = cur_card_to_move->next;
             cur_card_to_move = NULL;
             free(cur_card_to_move);
+            printf("it should be working if it gets here \n");
         }
         else{
             printf("Task %d does not exist.\n", task_id_target);

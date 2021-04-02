@@ -50,6 +50,7 @@ void save_tasks_data(task_list tasks_head){
             cur = cur->next;
         }
     }
+    fclose(fp);
     return;
 }
 
@@ -65,11 +66,75 @@ void recover_tasks_data(list todo_head, task_list tasks_head){
             cur_task_id++;
         }
     }
+    fclose(fp);
     return;
 }
 
 
 //#####################################################################
+//DOING LIST DATA HANDLING
+
+void save_doing_list_data(list doing_head){
+    list cur = doing_head->next;
+    FILE * fp = fopen("doing_list.txt", "w");
+    if(fp != NULL){
+        while(cur != NULL){
+            fprintf(fp, "%d %d %d %d %d ", cur->task_card->id, cur->task_card->p->id, cur->task_card->deadline.d, cur->task_card->deadline.m, cur->task_card->deadline.y);
+            cur = cur->next;
+        }
+    }
+    fclose(fp);
+    return;
+}
+
+void recover_doing_list_data(list todo_head, list doing_head, person_list people_head){
+    FILE * fp = fopen("doing_list.txt", "r");
+    if(fp != NULL){
+        int task_id;
+        int person_id;
+        date deadline;
+        while(fscanf(fp, "%d %d %d %d %d ", &task_id, &person_id, &deadline.d, &deadline.m, &deadline.y) == 5){
+            //                                  useless                                               useless  (just cuz move_task receives this parameters)
+            move_task(1, todo_head, doing_head, doing_head, people_head, person_id, task_id, deadline, deadline);
+        }
+    }
+    fclose(fp);
+    return;
+}
+
+//#####################################################################
+//DONE LIST DATA HANDLING
+
+void save_done_list_data(list done_head){
+    list cur = done_head->next;
+    FILE * fp = fopen("done_list.txt", "w");
+    if(fp != NULL){
+        while(cur != NULL){
+            fprintf(fp, "%d %d %d %d %d ", cur->task_card->id, cur->task_card->p->id, cur->task_card->end.d, cur->task_card->end.m, cur->task_card->end.y);
+            cur = cur->next;
+        }
+    }
+    fclose(fp);
+    return;
+}
+
+void recover_done_list_data(list todo_head, list doing_head, list done_head, person_list people_head){
+    FILE * fp = fopen("done_list.txt", "r");
+    if(fp != NULL){
+        int task_id;
+        int person_id;
+        date end;
+        while(fscanf(fp, "%d %d %d %d %d ", &task_id, &person_id, &end.d, &end.m, &end.y) == 5){
+            //same thing
+            move_task(1, todo_head, doing_head, done_head, people_head, person_id, task_id, make_date("0-0-0"), end);
+            move_task(2, todo_head, doing_head, done_head, people_head, person_id, task_id, make_date("0-0-0"), end);
+        }
+    }
+    fclose(fp);
+    return;
+}
+
+
 int main(){
     //sake of testing functions
     task_list tasks_list = make_task_list();
@@ -77,14 +142,13 @@ int main(){
     list doing_list = make_list();
     list done_list = make_list();
     person_list people = make_people_list();
-    add_person(people, 1, "jjjjjj");
+    /* add_person(people, 1, "jjjjjj");
     add_person(people, 2, "mandelbrot");
-    add_person(people, 3, "moc");
-    /* recover_people_data(people);
+    add_person(people, 3, "moc"); */
+    recover_people_data(people);
     show_people(people);
-    add_person(people, cur_person_id++, "carti");
+    //add_person(people, cur_person_id++, "carti");
     show_people(people);
-    save_people_data(people); */
 
     /* add_task(todo_list, tasks_list, 1, 10, "aznag", make_date("29-12-2000"));
     add_task(todo_list, tasks_list, 2, 6, "aznag2", make_date("29-12-2002"));
@@ -94,10 +158,22 @@ int main(){
     show_tasks(tasks_list);
     //add_task(todo_list, tasks_list, cur_task_id++, 7, "hm", make_date("29-12-2050"));
     show_tasks(tasks_list);
-    save_tasks_data(tasks_list);
     show_list(todo_list, 1);
+    recover_done_list_data(todo_list, doing_list, done_list, people);
+    recover_doing_list_data(todo_list, doing_list, people);
+    /* move_task(1, todo_list, doing_list, done_list, people, 3, 4, make_date("29-12-2005"), make_date("0-0-0"));
+    move_task(1, todo_list, doing_list, done_list, people, 2, 2, make_date("29-12-2001"), make_date("29-12-2001"));
+    move_task(1, todo_list, doing_list, done_list, people, 1, 1, make_date("29-12-2000"), make_date("29-12-2000"));
+    move_task(2, todo_list, doing_list, done_list, people, 1, 1, make_date("29-12-2001"), make_date("29-12-2003")); */
+    show_list(todo_list, 1);
+    show_list(doing_list,2);
+    show_list(done_list, 1);
+    save_people_data(people);
+    save_tasks_data(tasks_list);
+    save_doing_list_data(doing_list);
+    save_done_list_data(done_list);
+    
     /* printf("###############\n");
-    move_task(1, todo_list, doing_list, done_list, people, 3, 4, make_date("29-12-2005"), make_date("29-12-2005"));
     printf("TASKS: ");
     show_tasks(tasks_list);
     show_list(todo_list, 1);
