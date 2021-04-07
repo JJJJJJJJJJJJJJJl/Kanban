@@ -170,7 +170,7 @@ void op_1(list todo_head, task_list tasks_head){
     info = localtime(&rawtime);
     genesis.d = info->tm_mday;
     genesis.m = info->tm_mon+1;// +1 cuz tm_mon goes from 0 to 11
-    genesis.y = info->tm_year+1900;// +1900 cuz tm_year returns number of years from since 1900 
+    genesis.y = info->tm_year+1900;// +1900 cuz tm_year returns number of years since 1900 
     add_task(todo_head, tasks_head, cur_task_id++, task_priority, task_description, genesis);
 }
 
