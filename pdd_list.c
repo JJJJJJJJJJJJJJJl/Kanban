@@ -18,7 +18,6 @@ list make_list(){
 void neighbours_todo_card(list todo_head, int priority_target, date genesis_target, list * prev, list * cur){
     * prev = todo_head;
     * cur = todo_head->next;
-    
     //prev will be right before where linked list will get splitted (possibly. @↓↓)
     while(* cur != NULL && (*cur)->task_card->priority > priority_target){
         * prev = * cur;
@@ -26,12 +25,12 @@ void neighbours_todo_card(list todo_head, int priority_target, date genesis_targ
     }
 
     //no equal prioritys
-    if(* cur != NULL && (*cur)->task_card->priority < priority_target){
+    if(* cur != NULL && (*cur)->task_card->priority != priority_target){
         return;
     }
 
     //this's for the case of multiple equal prioritys so it finds node right before the split by task genesis date
-    while(* cur != NULL && date_cmp((* cur)->task_card->genesis, genesis_target) == -1){
+    while(* cur != NULL && (*cur)->task_card->priority == priority_target && date_cmp((* cur)->task_card->genesis, genesis_target) == -1){
         * prev = * cur;
         * cur = (* cur)->next; 
     }
@@ -226,6 +225,9 @@ void move_task(int flag, list todo_head, list doing_head, list done_head, person
             //setting done card task
             card->task_card = cur_card_to_move->task_card;
             card->task_card->pipeline_pos = 2;
+            
+            //removing deadline date from task
+            card->task_card->deadline = make_date("0-0-0");
 
             //assigning end date to task card
             card->task_card->end = end;
@@ -255,7 +257,6 @@ void move_task(int flag, list todo_head, list doing_head, list done_head, person
             prev_card_to_move->next = cur_card_to_move->next;
             cur_card_to_move = NULL;
             free(cur_card_to_move);
-            printf("it should be working if it gets here \n");
         }
         else{
             printf("Task %d does not exist.\n", task_id_target);
@@ -284,6 +285,9 @@ void move_task(int flag, list todo_head, list doing_head, list done_head, person
             //setting todo card task
             card->task_card = cur_card_to_move->task_card;
             card->task_card->pipeline_pos = 0;
+
+            //removing end date from task
+            card->task_card->end = make_date("0-0-0");
 
             //removing task from person tasks list since tasks was reopened
             task_list removed_person_tasks = card->task_card->p->tasks;
@@ -326,6 +330,9 @@ void move_task(int flag, list todo_head, list doing_head, list done_head, person
             //setting todo card task
             card->task_card = cur_card_to_move->task_card;
             card->task_card->pipeline_pos = 0;
+
+            //removing deadline date from task
+            card->task_card->deadline = make_date("0-0-0");
 
             //removing task from person tasks list since tasks was reopened
             task_list removed_person_tasks = card->task_card->p->tasks;
