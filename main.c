@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+#include <ctype.h>
 #include "pdd_list.h"
 
 int cur_person_id = 1;
@@ -132,11 +134,45 @@ void recover_done_list_data(list todo_head, list doing_head, list done_head, per
     }
     fclose(fp);
     return;
+} 
+
+int is_number(char * s){
+    for(int i=0; i<strlen(s); i++){
+        if(!isdigit(s[i])){
+            return 0;
+        }
+    }
+    return 1;
 }
 
-/* void action_1(){
-    printf()
-} */
+void op_1(list todo_head, task_list tasks_head){
+    int task_priority = 0;
+    char task_description_buffer[50];
+    date genesis;
+
+    int valid_input = 0;
+    while(valid_input == 0){
+        printf("Enter task priority: ");
+        valid_input = scanf("%d", &task_priority);
+
+        //cleaning stream to buffer so it doesnt mess up scanf
+        while ((getchar()) != '\n');
+    }
+
+    printf("Enter task description: ");
+    fgets(task_description_buffer, 50, stdin);
+    task_description_buffer[strlen(task_description_buffer)-1] = '\0';
+    char * task_description = strdup(task_description_buffer);
+
+    time_t rawtime;
+    struct tm * info;
+    time(&rawtime);
+    info = localtime(&rawtime);
+    genesis.d = info->tm_mday;
+    genesis.m = info->tm_mon+1;// +1 cuz tm_mon goes from 0 to 11
+    genesis.y = info->tm_year+1900;// +1900 cuz tm_year returns number of years from since 1900 
+    add_task(todo_head, tasks_head, cur_task_id++, task_priority, task_description, genesis);
+}
 
 int main(){
     task_list tasks_list = make_task_list();
@@ -156,15 +192,30 @@ int main(){
     add_task(todo_list, tasks_list, 3, 6, "read david goggins", make_date("29-12-2001"));
     add_task(todo_list, tasks_list, 4, 8, "follow the rules", make_date("29-12-2005")); */
     //add_task(todo_list, tasks_list, cur_task_id++, 10, "free time", make_date("29-12-2070"));
-    /* while(1){
-        int op;
-        scanf("%d", &op);
-        switch(op){
-            //create new task (adding it to both tasks and todo list)
-            case op == 1:
 
+    while(1){
+        int op;
+        printf("Operation: ");
+        scanf("%d", &op);
+
+        if(op == 1){
+            op_1(todo_list, tasks_list);
         }
-    } */
+        else if(op == 0){
+            printf("Bye ^-^\n");
+            break;
+        }
+        else{
+            printf("suspicious move my guy\n");
+        }
+
+        show_people(people);
+        show_tasks(tasks_list);
+        show_list(todo_list, 1);
+        show_list(doing_list,2);
+        show_list(done_list, 1);
+        printf("###########\n");
+    }
     
     show_people(people);
     show_tasks(tasks_list);
