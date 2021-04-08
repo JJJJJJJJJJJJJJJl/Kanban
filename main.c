@@ -246,7 +246,21 @@ int op_valid_input(int flag){
     return valid_value;
 }
 
-void op_2(list todo_head, list doing_head, person_list people_head){
+void op_2(person_list people_head){
+    char person_name_buffer[20];
+
+    //task description input, could be anything
+    printf("Enter person name: ");
+    fgets(person_name_buffer, 20, stdin);
+    person_name_buffer[strlen(person_name_buffer)-1] = '\0';
+    char * person_name = strdup(person_name_buffer);
+
+    add_person(people_head, cur_person_id++, person_name);
+
+    return;
+}
+
+void op_3(list todo_head, list doing_head, person_list people_head){
     int task_id_target = op_valid_input(0);
     int person_id_target = op_valid_input(1);
     date deadline;
@@ -262,7 +276,7 @@ void op_2(list todo_head, list doing_head, person_list people_head){
     return;
 }
 
-void op_3(list todo_head, list doing_head, person_list people_head){
+void op_4(list todo_head, list doing_head, person_list people_head){
     int task_id_target = op_valid_input(0);
 
     move_task(4, todo_head, doing_head, doing_head, people_head, -1, task_id_target, make_date("0-0-0"), make_date("0-0-0"));
@@ -270,7 +284,7 @@ void op_3(list todo_head, list doing_head, person_list people_head){
     return;
 }
 
-void op_4(list doing_head, list done_head, person_list people_head){
+void op_5(list doing_head, list done_head, person_list people_head){
     int task_id_target = op_valid_input(0);
     date end;
 
@@ -283,7 +297,7 @@ void op_4(list doing_head, list done_head, person_list people_head){
     return;
 }
 
-void op_5(list todo_head, list done_head, person_list people_head){
+void op_6(list todo_head, list done_head, person_list people_head){
     int task_id_target = op_valid_input(0);
 
     move_task(3, todo_head, todo_head, done_head, people_head, -1, task_id_target, make_date("0-0-0"), make_date("0-0-0"));
@@ -291,7 +305,7 @@ void op_5(list todo_head, list done_head, person_list people_head){
     return;
 }
 
-void op_6(list doing_head, person_list people_head){
+void op_7(list doing_head, person_list people_head){
     int task_id_target = op_valid_input(5);
     int person_id_heir_target = op_valid_input(6);
 
@@ -300,7 +314,7 @@ void op_6(list doing_head, person_list people_head){
     return;
 }
 
-void op_7(list todo_head, list doing_head, list done_head){
+void op_8(list todo_head, list doing_head, list done_head){
     printf("Todo: "); show_list(todo_head, 1);
     printf("Doing: "); show_list(doing_head, 2);
     printf("Done: "); show_list(done_head, 2);
@@ -308,7 +322,7 @@ void op_7(list todo_head, list doing_head, list done_head){
     return;
 }
 
-void op_8(person_list people_head){
+void op_9(person_list people_head){
     int person_id_target = op_valid_input(1);
 
     show_person_tasks(people_head, person_id_target);
@@ -316,19 +330,19 @@ void op_8(person_list people_head){
     return;
 }
 
-void op_9(task_list tasks_head){
+void op_10(task_list tasks_head){
     show_tasks(tasks_head);
 
     return;
 }
 
-void op_10(person_list people_head){
+void op_11(person_list people_head){
     show_people(people_head);
 
     return;
 }
 
-void op_11(list doing_head, list done_head, task_list tasks_head, person_list people_head){
+void op_12(list doing_head, list done_head, task_list tasks_head, person_list people_head){
     save_data(doing_head, done_head, tasks_head, people_head);
     printf("Dados guardados.\n");
 
@@ -340,17 +354,18 @@ void print_menu(){
     printf("+  Operações                              +\n");
     printf("+                                         +\n");
     printf("+  1 - Criar tarefa                       +\n");
-    printf("+  2 - Enviar tarefa de Todo para Doing   +\n");
-    printf("+  3 - Enviar tarefa de Doing para Todo   +\n");
-    printf("+  4 - Enviar tarefa de Doing para Done   +\n");
-    printf("+  5 - Enviar tarefa de Done para Todo    +\n");
-    printf("+  6 - Alterar pessoa em tarefa de Doing  +\n");
-    printf("+  7 - Visualizar quadro de tarefas       +\n");
-    printf("+  8 - Visualizar tarefas de X pessoa     +\n");
-    printf("+  9 - Visualizar todas as tarefas        +\n");
-    printf("+  10 - Visualizar pessoas                +\n");
-    printf("+  11 - Guardar estado currente           +\n");
-    printf("+  12 - Visualizar menu de operações      +\n");
+    printf("+  2 - Criar pessoa                       +\n");
+    printf("+  3 - Enviar tarefa de Todo para Doing   +\n");
+    printf("+  4 - Enviar tarefa de Doing para Todo   +\n");
+    printf("+  5 - Enviar tarefa de Doing para Done   +\n");
+    printf("+  6 - Enviar tarefa de Done para Todo    +\n");
+    printf("+  7 - Alterar pessoa em tarefa de Doing  +\n");
+    printf("+  8 - Visualizar quadro de tarefas       +\n");
+    printf("+  9 - Visualizar tarefas de X pessoa     +\n");
+    printf("+  10 - Visualizar todas as tarefas        +\n");
+    printf("+  11 - Visualizar pessoas                +\n");
+    printf("+  12 - Guardar estado currente           +\n");
+    printf("+  13 - Visualizar menu de operações      +\n");
     printf("+  0 - Sair (Alterações serão guardadas)  +\n");
     printf("+                                         +\n");
     printf("+++++++++++++++++++++++++++++++++++++++++++\n");
@@ -382,47 +397,51 @@ int main(){
         if(op == 1){
             op_1(todo_list, tasks_list);
         }
-        //send card from todo to doing
+        //create person
         else if(op == 2){
-            op_2(todo_list, doing_list, people_list);
+            op_2(people_list);
         }
-        //send card from doing to todo
+        //send card from todo to doing
         else if(op == 3){
             op_3(todo_list, doing_list, people_list);
         }
-        //send card from doing to done
+        //send card from doing to todo
         else if(op == 4){
-            op_4(doing_list, done_list, people_list);
+            op_4(todo_list, doing_list, people_list);
+        }
+        //send card from doing to done
+        else if(op == 5){
+            op_5(doing_list, done_list, people_list);
         }
         //send card from done to todo
-        else if(op == 5){
-            op_5(todo_list, done_list, people_list);
+        else if(op == 6){
+            op_6(todo_list, done_list, people_list);
         }
         //change person assigned to task
-        else if(op == 6){
-            op_6(doing_list, people_list);
+        else if(op == 7){
+            op_7(doing_list, people_list);
         }
         //visualize board
-        else if(op == 7){
-            op_7(todo_list, doing_list, done_list);
+        else if(op == 8){
+            op_8(todo_list, doing_list, done_list);
         }
         //visualize specific person tasks
-        else if(op == 8){
-            op_8(people_list);
+        else if(op == 9){
+            op_9(people_list);
         }
         //visualize all tasks
-        else if(op == 9){
-            op_9(tasks_list);
+        else if(op == 10){
+            op_10(tasks_list);
         }
         //visualize people
-        else if(op == 10){
-            op_10(people_list);
+        else if(op == 11){
+            op_11(people_list);
         }
         //save current state
-        else if(op == 11){
-            op_11(doing_list, done_list, tasks_list, people_list);
-        }
         else if(op == 12){
+            op_12(doing_list, done_list, tasks_list, people_list);
+        }
+        else if(op == 13){
             print_menu();
         }
         //exit program
