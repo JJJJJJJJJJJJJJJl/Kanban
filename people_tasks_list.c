@@ -69,7 +69,7 @@ void show_tasks(task_list tasks_head){
     task_list cur = tasks_head->next;
 
     while(cur != NULL){
-        printf("%s | ", cur->description);
+        printf("(%d,%s) ", cur->id, cur->description);
         cur = cur->next;
     }
     printf("\n");
@@ -128,7 +128,7 @@ void find_last_person(person_list people_head, person_list * cur){
 void show_people(person_list people_head){
     person_list cur = people_head->next;
     while(cur != NULL){
-        printf("%s | ", cur->name);
+        printf("(%d,%s) ", cur->id, cur->name);
         cur = cur->next;
     }
     printf("\n");
@@ -136,7 +136,7 @@ void show_people(person_list people_head){
 }
 
 //prints tasks of specific person   
-void show_person_tasks(person_list people_head, int person_id_target, int done_size){
+void show_person_tasks(person_list people_head, int person_id_target){
     person_list cur;
     find_person(people_head, person_id_target, &cur);
 
@@ -148,7 +148,7 @@ void show_person_tasks(person_list people_head, int person_id_target, int done_s
             zzz = 1;
             printf("\nDone: ");
         }
-        printf("%s | ", cur_person_task->description);
+        printf("(%d,%s) ", cur_person_task->id, cur_person_task->description);
         cur_person_task = cur_person_task->next_p;
     }
     if(zzz == 0){

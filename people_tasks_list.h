@@ -42,6 +42,6 @@ void add_person(person_list, int, char *);
 void find_person(person_list, int, person_list *);
 void find_last_person(person_list, person_list *);
 void show_people(person_list);
-void show_person_tasks(person_list, int, int);
+void show_person_tasks(person_list, int);
 
 #endif

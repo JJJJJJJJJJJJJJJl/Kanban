@@ -159,8 +159,6 @@ void move_task(int flag, list todo_head, list doing_head, list done_head, person
         if(cur_card_to_move != NULL){
 
             if(date_cmp(cur_card_to_move->task_card->genesis, deadline) == 1){
-                printf("%d-%d-%d | %d-%d-%d\n", cur_card_to_move->task_card->genesis.d, cur_card_to_move->task_card->genesis.m, cur_card_to_move->task_card->genesis.y,
-                deadline.d, deadline.m, deadline.y);
                 printf("Deadline must be latter genesis date\n");
                 return;
             }
@@ -224,8 +222,6 @@ void move_task(int flag, list todo_head, list doing_head, list done_head, person
             list cur_done_card;
             neighbours_done_card(done_head, end, &prev_done_card, &cur_done_card);
 
-            done_head->size++;
-
             //adding card to done list
             card->next = cur_done_card;
             prev_done_card->next = card;
@@ -279,12 +275,11 @@ void move_task(int flag, list todo_head, list doing_head, list done_head, person
 
         //searching for card in done list
         find_card(done_head, task_id_target, &prev_card_to_move, &cur_card_to_move);
+        
         if(cur_card_to_move != NULL){
             list prev_todo_card;
             list cur_todo_card;
             neighbours_todo_card(todo_head, cur_card_to_move->task_card->priority, cur_card_to_move->task_card->genesis, &prev_todo_card, &cur_todo_card);
-
-            done_head->size--;
 
             //adding card to todo list
             card->next = cur_todo_card;
@@ -327,6 +322,7 @@ void move_task(int flag, list todo_head, list doing_head, list done_head, person
 
         //searching for done in todo list
         find_card(doing_head, task_id_target, &prev_card_to_move, &cur_card_to_move);
+
         if(cur_card_to_move != NULL){
             list prev_todo_card;
             list cur_todo_card;
@@ -340,7 +336,7 @@ void move_task(int flag, list todo_head, list doing_head, list done_head, person
             card->task_card->pipeline_pos = 0;
 
             //removing deadline date from task
-            card->task_card->deadline = make_date("0-0-0");
+            card->task_card->deadline = make_date("0-0-9999999");
 
             //removing task from person tasks list since tasks was reopened
             task_list removed_person_tasks = card->task_card->p->tasks;
@@ -371,15 +367,16 @@ void move_task(int flag, list todo_head, list doing_head, list done_head, person
 }
 
 //changes person assigned to specific task
-void change_doing_task_person(list doing_head, person_list people_head, int task_id_target, int person_id_heir){
+void change_doing_task_person(list doing_head, person_list people_head, int task_id_target, int person_id_heir_target){
     person_list person_target;
-    find_person(people_head, person_id_heir, &person_target);
+    find_person(people_head, person_id_heir_target, &person_target);
     if(person_target != NULL){
+
         list prev_card_to_change;
         list cur_card_to_change;
         find_card(doing_head, task_id_target, &prev_card_to_change, &cur_card_to_change);
-        if(cur_card_to_change != NULL){
 
+        if(cur_card_to_change != NULL){
             //removing task from removed person tasks list
             person_list removed_person = cur_card_to_change->task_card->p;
             task_list prev_task;
@@ -403,7 +400,7 @@ void change_doing_task_person(list doing_head, person_list people_head, int task
         }
     }
     else{
-        printf("Person %d does not exist.\n", person_id_heir);
+        printf("Person %d does not exist.\n", person_id_heir_target);
     }
     return;
 }
@@ -413,8 +410,8 @@ void show_list(list head, int flag){
     list cur = head->next;
 
     while(cur != NULL){
-        if(flag == 1) printf("%s | ", cur->task_card->description);
-        else printf("(%s,%s) ", cur->task_card->p->name, cur->task_card->description);
+        if(flag == 1) printf("(%d,%s) ", cur->task_card->id, cur->task_card->description);
+        else printf("(%s,%d,%s) ", cur->task_card->p->name, cur->task_card->id, cur->task_card->description);
         cur = cur->next;
     }
     printf("\n");
