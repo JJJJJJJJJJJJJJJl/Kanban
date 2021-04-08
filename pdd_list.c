@@ -157,6 +157,14 @@ void move_task(int flag, list todo_head, list doing_head, list done_head, person
         find_card(todo_head, task_id_target, &prev_card_to_move, &cur_card_to_move);
         //if task actually exists
         if(cur_card_to_move != NULL){
+
+            if(date_cmp(cur_card_to_move->task_card->genesis, deadline) == 1){
+                printf("%d-%d-%d | %d-%d-%d\n", cur_card_to_move->task_card->genesis.d, cur_card_to_move->task_card->genesis.m, cur_card_to_move->task_card->genesis.y,
+                deadline.d, deadline.m, deadline.y);
+                printf("Deadline must be latter genesis date\n");
+                return;
+            }
+
             list prev_doing_card;
             list cur_doing_card;
             neighbours_doing_card(doing_head, person_target->name, &prev_doing_card, &cur_doing_card);

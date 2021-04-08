@@ -128,7 +128,7 @@ void recover_done_list_data(list todo_head, list doing_head, list done_head, per
         date end;
         while(fscanf(fp, "%d %d %d %d %d ", &task_id, &person_id, &end.d, &end.m, &end.y) == 5){
             //same thing
-            move_task(1, todo_head, doing_head, done_head, people_head, person_id, task_id, make_date("0-0-0"), end);
+            move_task(1, todo_head, doing_head, done_head, people_head, person_id, task_id, make_date("0-0-9999999"), end);
             move_task(2, todo_head, doing_head, done_head, people_head, person_id, task_id, make_date("0-0-0"), end);
         }
     }
@@ -136,13 +136,24 @@ void recover_done_list_data(list todo_head, list doing_head, list done_head, per
     return;
 } 
 
-int is_number(char * s){
-    for(int i=0; i<strlen(s); i++){
-        if(!isdigit(s[i])){
-            return 0;
-        }
-    }
-    return 1;
+//saves all data
+void save_data(list doing_head, list done_head, task_list tasks_head, person_list people_head){
+    save_people_data(people_head);
+    save_tasks_data(tasks_head);
+    save_doing_list_data(doing_head);
+    save_done_list_data(done_head);
+
+    return;
+}
+
+//recovers all data
+void recover_data(list todo_head, list doing_head, list done_head, task_list tasks_head, person_list people_head){
+    recover_people_data(people_head);
+    recover_tasks_data(todo_head, tasks_head);
+    recover_done_list_data(todo_head, doing_head, done_head, people_head);
+    recover_doing_list_data(todo_head, doing_head, people_head);
+
+    return;
 }
 
 void op_1(list todo_head, task_list tasks_head){
@@ -150,8 +161,9 @@ void op_1(list todo_head, task_list tasks_head){
     char task_description_buffer[50];
     date genesis;
 
+    //keeps asking for input while its not a number and its outside [1..10] range 
     int valid_input = 0;
-    while(valid_input == 0){
+    while(valid_input == 0 || task_priority < 1 || task_priority > 10){
         printf("Enter task priority: ");
         valid_input = scanf("%d", &task_priority);
 
@@ -159,11 +171,13 @@ void op_1(list todo_head, task_list tasks_head){
         while ((getchar()) != '\n');
     }
 
+    //task description input, could be anything
     printf("Enter task description: ");
     fgets(task_description_buffer, 50, stdin);
     task_description_buffer[strlen(task_description_buffer)-1] = '\0';
     char * task_description = strdup(task_description_buffer);
 
+    //task genesis date set to system current time 
     time_t rawtime;
     struct tm * info;
     time(&rawtime);
@@ -172,6 +186,50 @@ void op_1(list todo_head, task_list tasks_head){
     genesis.m = info->tm_mon+1;// +1 cuz tm_mon goes from 0 to 11
     genesis.y = info->tm_year+1900;// +1900 cuz tm_year returns number of years since 1900 
     add_task(todo_head, tasks_head, cur_task_id++, task_priority, task_description, genesis);
+
+    return;
+}
+
+int op_2_valid_input(int flag){
+    char * message;
+    if(flag == 2){
+        message = "DAY";
+    }
+    else if(flag == 3){
+        message = "MONTH";
+    }
+    else if(flag == 4){
+        message = "YEAR";
+    }
+    int valid_value;
+
+    int valid_input = 0;
+    while(valid_input == 0){
+        if(flag == 0) printf("Enter moving task id: ");
+        else if(flag == 1) printf("Enter assigned person id : ");
+        else printf("Enter task deadline %s: ", message);
+        valid_input = scanf("%d", &valid_value);
+
+        //cleaning stream to buffer so it doesnt mess up scanf
+        while ((getchar()) != '\n');
+    }
+    return valid_value;
+}
+
+void op_2(list todo_head, list doing_head, person_list people_head){
+    int task_id_target = op_2_valid_input(0);
+    int person_id_target = op_2_valid_input(1);
+    date deadline;
+
+    deadline.d = op_2_valid_input(2);
+    deadline.m = op_2_valid_input(3);
+    deadline.y = op_2_valid_input(4);
+    //                                  mandatory                                                           mandatory
+    //                                  so anything                                                         aswell
+    //                                  works
+    move_task(1, todo_head, doing_head, doing_head, people_head, person_id_target, task_id_target, deadline, make_date("0-0-0"));
+
+    return;
 }
 
 int main(){
@@ -179,14 +237,11 @@ int main(){
     list todo_list = make_list();
     list doing_list = make_list();
     list done_list = make_list();
-    person_list people = make_people_list();
+    person_list people_list = make_people_list();
     /* add_person(people, 1, "jjjjjj");
     add_person(people, 2, "mandelbrot marin");
     add_person(people, 3, "mocristino morais"); */
-    recover_people_data(people);
-    recover_tasks_data(todo_list, tasks_list);
-    recover_done_list_data(todo_list, doing_list, done_list, people);
-    recover_doing_list_data(todo_list, doing_list, people);
+    recover_data(todo_list, doing_list, done_list, tasks_list, people_list);
     /* add_task(todo_list, tasks_list, 1, 10, "paint the wall", make_date("29-12-2000"));
     add_task(todo_list, tasks_list, 2, 6, "purchase 7top", make_date("29-12-2002"));
     add_task(todo_list, tasks_list, 3, 6, "read david goggins", make_date("29-12-2001"));
@@ -195,12 +250,22 @@ int main(){
 
     while(1){
         int op;
-        printf("Operation: ");
-        scanf("%d", &op);
+        int valid_operation_input = 0;
+        while(valid_operation_input == 0){
+            printf("Operation: ");
+            valid_operation_input = scanf("%d", &op);
+            while ((getchar()) != '\n');
+        }
 
+        //create task
         if(op == 1){
             op_1(todo_list, tasks_list);
         }
+        //send card from todo to doing
+        else if(op == 2){
+            op_2(todo_list, doing_list, people_list);
+        }
+        //exit program
         else if(op == 0){
             printf("Bye ^-^\n");
             break;
@@ -209,7 +274,7 @@ int main(){
             printf("suspicious move my guy\n");
         }
 
-        show_people(people);
+        show_people(people_list);
         show_tasks(tasks_list);
         show_list(todo_list, 1);
         show_list(doing_list,2);
@@ -217,101 +282,7 @@ int main(){
         printf("###########\n");
     }
     
-    show_people(people);
-    show_tasks(tasks_list);
-    show_list(todo_list, 1);
-    show_list(doing_list,2);
-    show_list(done_list, 1);
+    save_data(doing_list, done_list, tasks_list, people_list);
     
-    save_people_data(people);
-    save_tasks_data(tasks_list);
-    save_doing_list_data(doing_list);
-    save_done_list_data(done_list);
-    
-    /* show_people(people);
-    add_person(people, cur_person_id++, "carti");
-    show_people(people); */
-    /* add_task(todo_list, tasks_list, 1, 10, "aznag", make_date("29-12-2000"));
-    add_task(todo_list, tasks_list, 2, 6, "aznag2", make_date("29-12-2002"));
-    add_task(todo_list, tasks_list, 3, 6, "aznag3", make_date("29-12-2001"));
-    add_task(todo_list, tasks_list, 4, 8, "aznag4", make_date("29-12-2005")); */
-    /* show_tasks(tasks_list);
-    add_task(todo_list, tasks_list, cur_task_id++, 7, "hm", make_date("29-12-2050"));
-    show_tasks(tasks_list);
-    show_list(todo_list, 1); */
-    /* move_task(1, todo_list, doing_list, done_list, people, 3, 4, make_date("29-12-2005"), make_date("0-0-0"));
-    move_task(1, todo_list, doing_list, done_list, people, 2, 2, make_date("29-12-2001"), make_date("29-12-2001"));
-    move_task(1, todo_list, doing_list, done_list, people, 1, 1, make_date("29-12-2000"), make_date("29-12-2000"));
-    move_task(2, todo_list, doing_list, done_list, people, 1, 1, make_date("29-12-2001"), make_date("29-12-2003")); */
-    /* printf("###############\n");
-    printf("TASKS: ");
-    show_tasks(tasks_list);
-    show_list(todo_list, 1);
-    show_list(doing_list,2);
-    show_person_tasks(people, 3, done_list->size);
-    move_task(1, todo_list, doing_list, done_list, people, 2, 2, make_date("29-12-2001"), make_date("29-12-2001"));
-    printf("TASK2: ");
-    show_tasks(tasks_list);
-    show_list(todo_list, 1);
-    show_list(doing_list,2);
-    show_person_tasks(people, 3, done_list->size);
-    show_person_tasks(people, 2, done_list->size);
-    move_task(1, todo_list, doing_list, done_list, people, 1, 1, make_date("29-12-2000"), make_date("29-12-2000"));
-    printf("TASK3: ");
-    show_tasks(tasks_list);
-    show_list(todo_list, 1);
-    show_list(doing_list,2);
-    printf("TASK4: ");
-    show_tasks(tasks_list);
-    //move_task(2, todo_list, doing_list, done_list, people, 1, 1, make_date("29-12-2001"), make_date("29-12-2003"));
-    show_person_tasks(people, 1, done_list->size);
-    show_person_tasks(people, 3, done_list->size);
-    change_doing_task_person(doing_list, people, 1, 3);
-    show_person_tasks(people, 1, done_list->size);
-    show_person_tasks(people, 3, done_list->size);
-    show_list(doing_list,2);
-    //remove_task_todo(todo_list, 3);
-    show_list(todo_list, 1);
-    show_list(doing_list, 2);
-    show_list(done_list, 1);
-    printf("AFTER MOVING aznags\n");
-    show_list(todo_list, 1);
-    show_list(doing_list, 2);
-    show_tasks(tasks_list);
-    show_person_tasks(people, 1, done_list->size);
-    show_person_tasks(people, 3, done_list->size);
-    show_tasks(tasks_list);
-    move_task(2, todo_list, doing_list, done_list, people, 2, 2, make_date("29-12-2001"), make_date("29-12-2001"));
-    move_task(2, todo_list, doing_list, done_list, people, 2, 4, make_date("29-12-2005"), make_date("29-12-2005"));
-    show_person_tasks(people, 1, done_list->size);
-    show_person_tasks(people, 3, done_list->size);
-    printf("############################\n");
-    show_tasks(tasks_list);
-    show_list(todo_list, 1);
-    show_list(doing_list, 1);
-    show_list(done_list, 1);
-    printf("MOVING FROM DONE TO TODO\n");
-    move_task(3, todo_list, doing_list, done_list, people, 2, 4, make_date("29-12-2005"), make_date("29-12-2005"));
-    show_tasks(tasks_list);
-    show_list(todo_list, 1);
-    show_list(doing_list, 1);
-    show_list(done_list, 1);
-    printf("MOVING FROM DOING TO TODO\n");
-    move_task(4, todo_list, doing_list, done_list, people, 2, 1, make_date("29-12-2005"), make_date("29-12-2005"));
-    show_list(todo_list, 1);
-    show_list(doing_list, 2);
-    move_task(1, todo_list, doing_list, done_list, people, 2, 1, make_date("29-12-2005"), make_date("29-12-2005"));
-    move_task(1, todo_list, doing_list, done_list, people, 2, 2, make_date("29-12-2005"), make_date("29-12-2005"));
-    printf("$$$$$$$$$$$$$$$$$$$$$$$$$\n");
-    show_tasks(tasks_list);
-    show_list(todo_list, 1);
-    show_list(doing_list, 2);
-    printf("CHANGING aznag TASK TO MOC\n");
-    show_person_tasks(people, 3, done_list->size);
-    change_doing_task_person(doing_list, people, 1, 3);
-    show_list(doing_list, 2);
-    move_task(2, todo_list, doing_list, done_list, people, 3, 4, make_date("29-12-2005"), make_date("29-12-2005"));
-    show_person_tasks(people, 1, done_list->size);
-    show_person_tasks(people, 3, done_list->size); */
     return 0;
 }
