@@ -408,9 +408,11 @@ int main(){
         else if(op == 9){
             op_9(tasks_list);
         }
+        //visualize people
         else if(op == 10){
             op_10(people_list);
         }
+        //save current state
         else if(op == 11){
             op_11(doing_list, done_list, tasks_list, people_list);
         }
