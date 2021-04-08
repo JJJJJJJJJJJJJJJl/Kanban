@@ -366,6 +366,8 @@ int main(){
 
     //recovering data state
     recover_data(todo_list, doing_list, done_list, tasks_list, people_list);
+
+    //printing menu
     print_menu();
 
     while(1){
