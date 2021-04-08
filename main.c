@@ -337,7 +337,6 @@ void op_11(list doing_head, list done_head, task_list tasks_head, person_list pe
 }
 
 void print_menu(){
-    printf("\n◔ ◔ Kanban ◉ ◉\n\n");
     printf("+++++++++++++++++++++++++++++++++++++++++++\n");
     printf("+  Operações                              +\n");
     printf("+                                         +\n");
@@ -352,9 +351,12 @@ void print_menu(){
     printf("+  9 - Visualizar todas as tarefas        +\n");
     printf("+  10 - Visualizar pessoas                +\n");
     printf("+  11 - Guardar estado currente           +\n");
+    printf("+  12 - Visualizar menu de operações      +\n");
     printf("+  0 - Sair (Alterações serão guardadas)  +\n");
     printf("+                                         +\n");
     printf("+++++++++++++++++++++++++++++++++++++++++++\n");
+    
+    return;
 }
 
 int main(){
@@ -366,6 +368,9 @@ int main(){
 
     //recovering data state
     recover_data(todo_list, doing_list, done_list, tasks_list, people_list);
+
+    //introduction
+    printf("\n◔ ◔ Kanban ◉ ◉\n\n");
 
     //printing menu
     print_menu();
@@ -417,6 +422,9 @@ int main(){
         //save current state
         else if(op == 11){
             op_11(doing_list, done_list, tasks_list, people_list);
+        }
+        else if(op == 12){
+            print_menu();
         }
         //exit program
         else if(op == 0){
