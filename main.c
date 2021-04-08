@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <ctype.h>
 #include "pdd_list.h"
 
 int cur_person_id = 1;
