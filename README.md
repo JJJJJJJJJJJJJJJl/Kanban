@@ -2,9 +2,4 @@
 
 Concept: -> -> -> -> ->
 
-left to do:<br/>
-- [x] saving state in files n readin it back<br/>
-- [x] console interface<br/>
-- [ ] some general code details.<br/>
-
 ![birch](./assets/scheme.png)
