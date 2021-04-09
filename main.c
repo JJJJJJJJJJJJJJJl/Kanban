@@ -171,7 +171,7 @@ void op_1(list todo_head, task_list tasks_head){
     //keeps asking for input while its not a number and its outside [1..10] range 
     int valid_input = 0;
     while(valid_input == 0 || task_priority < 1 || task_priority > 10){
-        printf("Enter task priority: ");
+        printf("Prioridade da tarefa: ");
         valid_input = scanf("%d", &task_priority);
 
         //cleaning stream to buffer so it doesnt mess scanf up
@@ -179,7 +179,7 @@ void op_1(list todo_head, task_list tasks_head){
     }
 
     //task description input, could be anything
-    printf("Enter task description: ");
+    printf("Descrição da tarefa: ");
     fgets(task_description_buffer, 50, stdin);
     task_description_buffer[strlen(task_description_buffer)-1] = '\0';
     char * task_description = strdup(task_description_buffer);
@@ -250,7 +250,7 @@ void op_2(person_list people_head){
     char person_name_buffer[20];
 
     //task description input, could be anything
-    printf("Enter person name: ");
+    printf("Nome da pessoa: ");
     fgets(person_name_buffer, 20, stdin);
     person_name_buffer[strlen(person_name_buffer)-1] = '\0';
     char * person_name = strdup(person_name_buffer);
