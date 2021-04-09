@@ -127,6 +127,11 @@ void find_last_person(person_list people_head, person_list * cur){
 //prints people 
 void show_people(person_list people_head){
     person_list cur = people_head->next;
+    if(cur == NULL){
+        printf("Lista de pessoas vazia.\n");
+        return;
+    }
+    printf("Pessoas: ");
     while(cur != NULL){
         printf("(%d,%s) ", cur->id, cur->name);
         cur = cur->next;
@@ -140,19 +145,25 @@ void show_person_tasks(person_list people_head, int person_id_target){
     person_list cur;
     find_person(people_head, person_id_target, &cur);
 
-    task_list cur_person_task = cur->tasks->next_p;
-    int zzz = 0;
-    printf("Doing: ");
-    while(cur_person_task != NULL){
-        if(cur_person_task->pipeline_pos == 2){
-            zzz = 1;
-            printf("\nDone: ");
+    if(cur != NULL){
+        task_list cur_person_task = cur->tasks->next_p;
+        int zzz = 0;
+        printf("Tarefas de pessoa %d:\n", person_id_target);
+        printf("\tDoing: ");
+        while(cur_person_task != NULL){
+            if(cur_person_task->pipeline_pos == 2){
+                zzz = 1;
+                printf("\n\tDone: ");
+            }
+            printf("(%d,%s) ", cur_person_task->id, cur_person_task->description);
+            cur_person_task = cur_person_task->next_p;
         }
-        printf("(%d,%s) ", cur_person_task->id, cur_person_task->description);
-        cur_person_task = cur_person_task->next_p;
+        if(zzz == 0){
+            printf("\n\tDone: ");
+        }
     }
-    if(zzz == 0){
-        printf("\nDone: ");
+    else{
+        printf("✖ Pessoa %d não existe.\n", person_id_target);
     }
     printf("\n");
     return;

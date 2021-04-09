@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "date.h"
@@ -13,6 +14,13 @@ date make_date(char * datee){
         date_nums[in++] = atoi(token);
         token = strtok(NULL, "-");
     }
+    if(date_nums[0] < 1 || date_nums[0] > 31){
+        printf("✖ Valor de DIA inválido.\n");
+    }
+    if(date_nums[1] < 1 || date_nums[1] > 12){
+        printf("✖ Valor de MÊS inválido.\n");
+    }
+
     date d = {date_nums[0], date_nums[1], date_nums[2]};
     return d;
 }

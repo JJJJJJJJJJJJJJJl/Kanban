@@ -134,8 +134,8 @@ void recover_done_list_data(list todo_head, list doing_head, list done_head, per
         date end;
         while(fscanf(fp, "%d %d %d %d %d ", &task_id, &person_id, &end.d, &end.m, &end.y) == 5){
             //same thing
-            move_task(1, todo_head, doing_head, done_head, people_head, person_id, task_id, make_date("0-0-9999999"), end);
-            move_task(2, todo_head, doing_head, done_head, people_head, person_id, task_id, make_date("0-0-0"), end);
+            move_task(1, todo_head, doing_head, done_head, people_head, person_id, task_id, make_date("1-1-9999999"), end);
+            move_task(2, todo_head, doing_head, done_head, people_head, person_id, task_id, make_date("1-1-9999999"), end);
         }
     }
     fclose(fp);
@@ -235,7 +235,7 @@ int op_valid_input(int flag){
             printf("ID da nova pessoa responsável: ");
         }
         else if(flag == 420){
-            printf("\nOperação: ");
+            printf("\n☥  Operação: ");
         }
         valid_input = scanf("%d", &valid_value);
 
@@ -271,7 +271,7 @@ void op_3(list todo_head, list doing_head, person_list people_head){
     //                                  mandatory                                                           mandatory
     //                                  so anything                                                         aswell
     //                                  works
-    move_task(1, todo_head, doing_head, doing_head, people_head, person_id_target, task_id_target, deadline, make_date("0-0-0"));
+    move_task(1, todo_head, doing_head, doing_head, people_head, person_id_target, task_id_target, deadline, make_date("1-1-1"));
 
     return;
 }
@@ -279,7 +279,7 @@ void op_3(list todo_head, list doing_head, person_list people_head){
 void op_4(list todo_head, list doing_head, person_list people_head){
     int task_id_target = op_valid_input(0);
 
-    move_task(4, todo_head, doing_head, doing_head, people_head, -1, task_id_target, make_date("0-0-0"), make_date("0-0-0"));
+    move_task(4, todo_head, doing_head, doing_head, people_head, -1, task_id_target, make_date("1-1-1"), make_date("1-1-1"));
     
     return;
 }
@@ -292,7 +292,7 @@ void op_5(list doing_head, list done_head, person_list people_head){
     end.m = op_valid_input(8);
     end.y = op_valid_input(9);
 
-    move_task(2, doing_head, doing_head, done_head, people_head, -1, task_id_target, make_date("0-0-0"), end);
+    move_task(2, doing_head, doing_head, done_head, people_head, -1, task_id_target, make_date("1-1-1"), end);
 
     return;
 }
@@ -300,7 +300,7 @@ void op_5(list doing_head, list done_head, person_list people_head){
 void op_6(list todo_head, list done_head, person_list people_head){
     int task_id_target = op_valid_input(0);
 
-    move_task(3, todo_head, todo_head, done_head, people_head, -1, task_id_target, make_date("0-0-0"), make_date("0-0-0"));
+    move_task(3, todo_head, todo_head, done_head, people_head, -1, task_id_target, make_date("1-1-1"), make_date("1-1-1"));
 
     return;
 }
@@ -316,7 +316,9 @@ void op_7(list doing_head, person_list people_head){
 
 void op_8(list todo_head, list doing_head, list done_head){
     printf("Todo: "); show_list(todo_head, 1);
+    printf("\n");
     printf("Doing: "); show_list(doing_head, 2);
+    printf("\n");
     printf("Done: "); show_list(done_head, 2);
 
     return;
@@ -324,6 +326,7 @@ void op_8(list todo_head, list doing_head, list done_head){
 
 void op_9(person_list people_head){
     int person_id_target = op_valid_input(1);
+    printf("\n");
 
     show_person_tasks(people_head, person_id_target);
 
@@ -344,31 +347,31 @@ void op_11(person_list people_head){
 
 void op_12(list doing_head, list done_head, task_list tasks_head, person_list people_head){
     save_data(doing_head, done_head, tasks_head, people_head);
-    printf("Dados guardados.\n");
+    printf("Dados guardados ✓\n");
 
     return;
 }
 
 void print_menu(){
-    printf("+++++++++++++++++++++++++++++++++++++++++++\n");
-    printf("+  Operações                              +\n");
-    printf("+                                         +\n");
-    printf("+  1 - Criar tarefa                       +\n");
-    printf("+  2 - Criar pessoa                       +\n");
-    printf("+  3 - Enviar tarefa de Todo para Doing   +\n");
-    printf("+  4 - Enviar tarefa de Doing para Todo   +\n");
-    printf("+  5 - Enviar tarefa de Doing para Done   +\n");
-    printf("+  6 - Enviar tarefa de Done para Todo    +\n");
-    printf("+  7 - Alterar pessoa em tarefa de Doing  +\n");
-    printf("+  8 - Visualizar quadro de tarefas       +\n");
-    printf("+  9 - Visualizar tarefas de X pessoa     +\n");
-    printf("+  10 - Visualizar todas as tarefas        +\n");
-    printf("+  11 - Visualizar pessoas                +\n");
-    printf("+  12 - Guardar estado currente           +\n");
-    printf("+  13 - Visualizar menu de operações      +\n");
-    printf("+  0 - Sair (Alterações serão guardadas)  +\n");
-    printf("+                                         +\n");
-    printf("+++++++++++++++++++++++++++++++++++++++++++\n");
+    printf("+-----------------------------------------------+\n");
+    printf("|  Operações                                    |\n");
+    printf("|                                               |\n");
+    printf("|  1 - Criar tarefa                             |\n");
+    printf("|  2 - Criar pessoa                             |\n");
+    printf("|  3 - Enviar tarefa de Todo para Doing         |\n");
+    printf("|  4 - Enviar tarefa de Doing para Todo         |\n");
+    printf("|  5 - Enviar tarefa de Doing para Done         |\n");
+    printf("|  6 - Enviar tarefa de Done para Todo          |\n");
+    printf("|  7 - Alterar pessoa responsável pela tarefa   |\n");
+    printf("|  8 - Visualizar quadro de tarefas             |\n");
+    printf("|  9 - Visualizar tarefas de pessoa X           |\n");
+    printf("|  10 - Visualizar todas as tarefas             |\n");
+    printf("|  11 - Visualizar pessoas                      |\n");
+    printf("|  12 - Guardar estado corrente                 |\n");
+    printf("|  13 - Visualizar menu de operações            |\n");
+    printf("|  0 - Sair (Alterações serão guardadas)        |\n");
+    printf("|                                               |\n");
+    printf("+-----------------------------------------------+\n");
     
     return;
 }
@@ -446,16 +449,17 @@ int main(){
         }
         //exit program
         else if(op == 0){
-            printf("Bye ^-^\n");
+            printf("A encerrar ⨻\n");
             break;
         }
         else{
-            printf("Hmm, nope! ರ_ರ\n");
+            printf("Input duvidoso.. ☣\n");
         }
     }
     
     //saving data state
     save_data(doing_list, done_list, tasks_list, people_list);
+    printf("Dados guardados ✓\n");
     
     return 0;
 }

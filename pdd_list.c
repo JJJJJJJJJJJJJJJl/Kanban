@@ -40,7 +40,7 @@ void neighbours_todo_card(list todo_head, int priority_target, date genesis_targ
 //creates a task, gets added to both todo and tasks list
 void add_task(list todo_head, task_list tasks_head, int id, int priority, char * description, date genesis){
     if(priority < 1 || priority > 10){
-        printf("Invalid priority value.\n");
+        printf("✖ Valor de prioridade inválido.\n");
         return;
     }
 
@@ -127,7 +127,7 @@ void move_task(int flag, list todo_head, list doing_head, list done_head, person
 
     list card = (list) malloc(sizeof(list_node));
     if(card == NULL){
-        printf("Allocation went wrong.");
+        printf("✖ Erro na alocação de memória.");
         return;
     }
     
@@ -137,7 +137,7 @@ void move_task(int flag, list todo_head, list doing_head, list done_head, person
 
     if(flag == 1){
         if(todo_head->next == NULL){
-            printf("Todo list is empty.\n");
+            printf("Lista Todo vazia.\n");
             return;
         }
 
@@ -145,11 +145,11 @@ void move_task(int flag, list todo_head, list doing_head, list done_head, person
         find_person(people_head, person_id_target, &person_target);
 
         if(person_target == NULL){
-            printf("Person %d does not exist. (Create it before assinging task)\n", person_id_target);
+            printf("✖ Pessoa %d não existe.\n", person_id_target);
             return;
         }
         if(doing_head->size > 4){
-            printf("Doing list is full.\n");
+            printf("✖ Lista Doing lotada.\n");
             return;
         }
 
@@ -159,7 +159,7 @@ void move_task(int flag, list todo_head, list doing_head, list done_head, person
         if(cur_card_to_move != NULL){
 
             if(date_cmp(cur_card_to_move->task_card->genesis, deadline) == 1){
-                printf("Deadline must be latter genesis date\n");
+                printf("✖ Prazo de conclusão tem de ser posterior à data de criação.\n");
                 return;
             }
 
@@ -199,13 +199,13 @@ void move_task(int flag, list todo_head, list doing_head, list done_head, person
             free(cur_card_to_move);
         }
         else{
-            printf("Task %d does not exist.\n", task_id_target);
+            printf("✖ Tarefa %d não existe.\n", task_id_target);
         }
     }
     
     else if(flag == 2){
         if(doing_head->size == 0){
-            printf("Doing list is empty.\n");
+            printf("✖ Lista Doing vazia.\n");
             return;
         }
 
@@ -214,7 +214,7 @@ void move_task(int flag, list todo_head, list doing_head, list done_head, person
 
         if(cur_card_to_move != NULL){
             if(date_cmp(cur_card_to_move->task_card->genesis, end) == 1){
-                printf("End date must come after genesis date.\n");
+                printf("✖ Data de conclusão tem de ser posterior à data de criação.\n");
                 return;
             }
 
@@ -231,7 +231,7 @@ void move_task(int flag, list todo_head, list doing_head, list done_head, person
             card->task_card->pipeline_pos = 2;
             
             //removing deadline date from task
-            card->task_card->deadline = make_date("0-0-0");
+            card->task_card->deadline = make_date("1-1-1");
 
             //assigning end date to task card
             card->task_card->end = end;
@@ -263,13 +263,13 @@ void move_task(int flag, list todo_head, list doing_head, list done_head, person
             free(cur_card_to_move);
         }
         else{
-            printf("Task %d does not exist.\n", task_id_target);
+            printf("✖ Tarefa %d não existe.\n", task_id_target);
         }
     }
 
     else if(flag == 3){
         if(done_head->next == NULL){
-            printf("Done list is empty.\n");
+            printf("✖ Lista Doing vazia.\n");
             return;
         }
 
@@ -290,7 +290,7 @@ void move_task(int flag, list todo_head, list doing_head, list done_head, person
             card->task_card->pipeline_pos = 0;
 
             //removing end date from task
-            card->task_card->end = make_date("0-0-0");
+            card->task_card->end = make_date("1-1-1");
 
             //removing task from person tasks list since tasks was reopened
             task_list removed_person_tasks = card->task_card->p->tasks;
@@ -310,13 +310,13 @@ void move_task(int flag, list todo_head, list doing_head, list done_head, person
             free(cur_card_to_move);
         }
         else{
-            printf("Task %d does not exist.\n", task_id_target);
+            printf("✖ Tarefa %d não existe.\n", task_id_target);
         }
     }
 
     else if(flag == 4){
         if(doing_head->size == 0){
-            printf("Doing list is empty.\n");
+            printf("✖ Lista Doing vazia.\n");
             return;
         }
 
@@ -356,12 +356,8 @@ void move_task(int flag, list todo_head, list doing_head, list done_head, person
             free(cur_card_to_move);
         }
         else{
-            printf("Task %d does not exist.\n", task_id_target);
+            printf("✖ Tarefa %d não existe.\n", task_id_target);
         }
-    }
-
-    else{
-        printf("%d is not a valid flag number.\n", flag);
     }
     return;
 }
@@ -396,11 +392,11 @@ void change_doing_task_person(list doing_head, person_list people_head, int task
             cur_card_to_change->task_card->p = person_target;
         }
         else{
-            printf("Task %d does not exist.\n", task_id_target);
+            printf("✖ Tarefa %d não existe.\n", task_id_target);
         }
     }
     else{
-        printf("Person %d does not exist.\n", person_id_heir_target);
+        printf("✖ Pessoa %d não existe.\n", person_id_heir_target);
     }
     return;
 }
@@ -410,8 +406,8 @@ void show_list(list head, int flag){
     list cur = head->next;
 
     while(cur != NULL){
-        if(flag == 1) printf("(%d,%s) ", cur->task_card->id, cur->task_card->description);
-        else printf("(%s,%d,%s) ", cur->task_card->p->name, cur->task_card->id, cur->task_card->description);
+        if(flag == 1) printf("(%d, %s) ", cur->task_card->id, cur->task_card->description);
+        else printf("(%d, %s, %s) ", cur->task_card->id, cur->task_card->description, cur->task_card->p->name);
         cur = cur->next;
     }
     printf("\n");
